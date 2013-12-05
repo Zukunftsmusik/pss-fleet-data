@@ -41,7 +41,7 @@ def collect_data(start_timestamp: datetime) -> dict:
         util.vrbs(f'Retrieved {len(user_infos)} user infos after {retrieved_user_data_raw_after:0.2f} seconds.')
     util.prnt(f'Processing raw data...')
 
-    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score']] for fleet_info in fleet_infos.values()]
+    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score'], fleet_info['DivisionDesignId']] for fleet_info in fleet_infos.values()]
     users = [[user_info['Id'], user_info['Name']] for user_info in user_infos.values()]
     output_timestamp = util.format_output_timestamp(start_timestamp)
     data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos.values()]
