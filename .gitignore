@@ -1,6 +1,8 @@
 # Custom
 .DS_Store
 tourney-data/
+client_secrets.json
+settings.yaml
 
 
 # Byte-compiled / optimized / DLL files
