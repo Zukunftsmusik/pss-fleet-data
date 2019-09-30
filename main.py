@@ -7,6 +7,7 @@ import time
 import alliances
 import gdrive
 import pydrive
+import settings
 import utility as util
 
 
@@ -35,8 +36,15 @@ def main():
             time.sleep(sleep_for_seconds)
 
 
+def init():
+    if settings.FOLDERS_TO_BE_CREATED:
+        for folder_name in settings.FOLDERS_TO_BE_CREATED:
+            if not os.path.isdir(folder_name):
+                os.mkdir(folder_name)
+
 
 
 
 if __name__ == '__main__':
+    init()
     main()
