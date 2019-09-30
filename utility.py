@@ -119,6 +119,7 @@ def save_to_filesystem(content: str, file_name: str) -> None:
 
 
 def save_to_gdrive(content: str, file_name: str) -> None:
+    gdrive.init(force=True)
     try:
         gdrive.upload_file(file_name, content)
     except Exception as error:

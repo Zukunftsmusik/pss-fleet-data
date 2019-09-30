@@ -95,7 +95,7 @@ def upload_file(file_name: str, content: str):
     drive_file.Upload()
 
 
-def init():
+def init(force: bool = False):
     global __drive, __initialized
     if not __initialized:
         create_service_account_credential_json()
@@ -108,4 +108,4 @@ def init():
 
 
 if __name__ == '__main__' or settings.STORE_AT_GDRIVE:
-    init()
+    init(force=False)
