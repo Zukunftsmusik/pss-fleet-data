@@ -59,16 +59,6 @@ def create_service_account_settings_yaml():
     util.dbg(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
-#def _get_credentials_from_file(service_account_file: str, scopes: list) -> google.oauth2.service_account.Credentials:
-#    result = google.oauth2.service_account.Credentials.from_service_account_file(service_account_file, scopes=scopes)
-#    return result
-
-
-#def create_gdrive_api_object(credentials: google.oauth2.service_account.Credentials):
-#    result = googleapiclient.discovery.build('drive', 'v3', credentials=credentials)
-#    return result
-
-
 def __assert_initialized():
     if __drive is None:
         raise Exception('The __drive object has not been initialized, yet!')
