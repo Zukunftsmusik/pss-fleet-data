@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 import getopt
 import os
@@ -10,9 +12,6 @@ import pydrive
 import settings
 import utility as util
 
-
-PWD = os.getcwd()
-sys.path.insert(0, f'{PWD}/')
 
 
 def main():
@@ -37,11 +36,14 @@ def main():
 
 
 def init(store_at_filesystem: bool = True, store_at_gdrive: bool = True):
+    PWD = os.getcwd()
+    sys.path.insert(0, f'{PWD}/')
+
     if store_at_filesystem is not None:
         util.dbg(f'Store at filesystem: {store_at_filesystem}')
         settings.STORE_AT_FILESYSTEM = store_at_filesystem
     if store_at_gdrive is not None:
-        util.dbg(f'Store at google drive: {store_at_filesystem}')
+        util.dbg(f'Store at google drive: {store_at_gdrive}')
         settings.STORE_AT_GDRIVE = store_at_gdrive
 
     if settings.FOLDERS_TO_BE_CREATED:
@@ -51,28 +53,45 @@ def init(store_at_filesystem: bool = True, store_at_gdrive: bool = True):
 
 
 def print_help():
-    print(f'Usage: main.py -f <bool> -g <bool>')
+    bool_values = list(settings.FALSE_VALUES)
+    bool_values.extend(settings.TRUE_VALUES)
+    print(f'Usage: main.py [-h] [-f <bool>] [-g <bool>]\n')
+    print(f'       -f:  <bool> store at file system (default is {settings.STORE_AT_FILESYSTEM})')
+    print(f'     --fs:  see option \'f\'')
+    print(f'       -g:  <bool> store at google drive (default is {settings.STORE_AT_GDRIVE})')
+    print(f' --gdrive:  see option \'g\'')
+    print(f'\nbool values: {", ".join(bool_values)}\n')
+    sys.exit()
 
+
+def __check_bool_arg(arg: str) -> bool:
+    arg = str(arg).lower()
+    if arg in settings.TRUE_VALUES:
+        return True
+    elif arg in settings.FALSE_VALUES:
+        return False
+    else:
+        print_help()
 
 
 
 if __name__ == '__main__':
-    args = sys.argv[1:]
     store_at_filesystem = None
     store_at_gdrive = None
+
     try:
-        opts, args = getopt.getopt(sys.argv, 'hf:g:', 'fs=gdrive=')
+        opts, args = getopt.getopt(sys.argv[1:], 'hf:g:', 'fs=gdrive=')
     except getopt.GetoptError:
         print_help()
     else:
         for opt, arg in opts:
             if opt == '-h':
                 print_help()
-                sys.exit()
+                break
             elif opt == '-f' or opt == '--fs':
-                store_at_filesystem = bool(arg)
+                store_at_filesystem = __check_bool_arg(arg)
             elif opt == '-g' or opt == '--gdrive':
-                store_at_gdrive = bool(arg)
+                store_at_gdrive = __check_bool_arg(arg)
 
     init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive)
     main()

@@ -29,6 +29,9 @@ SHORT_USER_INFO_FIELDS = {
 TD_ONE_DAY = timedelta(days=1)
 TZ_UTC = timezone.utc
 
+TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
+FALSE_VALUES = ['n', 'no', '0', 'f', 'false']
+
 
 
 if OBTAIN_AT_HOURS:

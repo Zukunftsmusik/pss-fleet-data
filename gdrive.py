@@ -87,7 +87,7 @@ def upload_file(file_name: str, content: str):
 
 def init(force: bool = False):
     global __drive, __initialized
-    if not __initialized:
+    if (force or not __initialized) and settings.STORE_AT_GDRIVE:
         create_service_account_credential_json()
         create_service_account_settings_yaml()
         gauth = GoogleAuth()
@@ -95,7 +95,3 @@ def init(force: bool = False):
         gauth.credentials = credentials
         __drive = GoogleDrive(gauth)
         __initialized = True
-
-
-if __name__ == '__main__' or settings.STORE_AT_GDRIVE:
-    init(force=False)
