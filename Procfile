@@ -1,1 +1,1 @@
-worker: python main.py
+worker: python main.py -f 0 -g 1
