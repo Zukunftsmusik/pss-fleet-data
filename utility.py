@@ -1,6 +1,6 @@
-
-
 from datetime import datetime, timezone
+import json
+import os
 import time
 import urllib.request
 import xml.etree.ElementTree
@@ -23,7 +23,7 @@ def err(msg: str, error: Exception = None) -> None:
     if error is None:
         msg = f'ERROR  {msg}'
     else:
-        msg = f'ERROR  {msg}: {error}'
+        msg = f'ERROR  {msg}\n{error}'
     prnt(msg)
 
 
@@ -149,7 +149,7 @@ def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
     if end is None:
         end = get_utc_now()
     duration = end - start
-    result = duration.second
+    result = duration.seconds
     return result
 
 
@@ -168,14 +168,13 @@ def xmltree_to_dict3(raw_text: str, key_name: str) -> dict:
 
 # ---------- Storage ----------
 
-def save_to_filesystem(content: str, file_name: str) -> None:
-    file_name = file_name.strip('/')
-    file_name = f'tourney-data/{file_name}'
+def save_to_filesystem(content: str, file_name: str, folder_path: str) -> None:
+    file_path = os.path.join(folder_path, file_name)
     try:
-        with open(file_name, 'w+') as json_file:
-            json_file.write(content)
+        with open(file_path, 'w+') as write_file:
+            write_file.write(content)
     except Exception as error:
-        err('Could not create, open or write the file', error)
+        err(f'Could not create, open or write the file at: {file_path}', error)
 
 
 def save_to_gdrive(content: str, file_name: str) -> None:
@@ -186,6 +185,28 @@ def save_to_gdrive(content: str, file_name: str) -> None:
         err(f'Could not upload the file to google drive', error)
     else:
         dbg(f'Successfully uploaded {file_name} to google drive.')
+
+
+def dump_data(data: object, file_name: str, folder_path: str) -> None:
+    file_path = os.path.join(folder_path, file_name)
+    try:
+        with open(file_path, 'w+') as write_file:
+            json.dump(data, write_file)
+    except Exception as error:
+        err(f'Could not create, open or write the file at: {file_path}', error)
+
+
+def update_data(data: object, file_name: str, folder_path: str) -> None:
+    file_path = os.path.join(folder_path, file_name)
+    if os.path.isfile(file_path):
+        try:
+            with open(file_path, 'r') as read_file:
+                data_old = json.load(read_file)
+        except Exception as error:
+            err(f'Could not read old data from file at: {file_path}', error)
+        else:
+            data.extend(data_old)
+    dump_data(data, file_name, folder_path)
 
 
 
@@ -228,7 +249,7 @@ def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -
                 if second >= utc_now.second:
                     return t
                 else:
-                    return settings.obtain_at_timestamps[(i + 1) % len(settings.obtain_at_timestamps)]
+                    return obtain_at_timestamps[(i + 1) % len(obtain_at_timestamps)]
 
 
 def get_collect_file_name(utc_now: datetime) -> str:
@@ -236,8 +257,8 @@ def get_collect_file_name(utc_now: datetime) -> str:
     return result
 
 
-def should_obtain_data(utc_now: datetime) -> bool:
-    result = (utc_now.hour, utc_now.minute, utc_now.second) in settings.obtain_at_timestamps
+def should_obtain_data(utc_now: datetime, obtain_at_timestamps: list) -> bool:
+    result = (utc_now.hour, utc_now.minute, utc_now.second) in obtain_at_timestamps
     return result
 
 

@@ -96,17 +96,14 @@ def retrieve_and_store_user_infos() -> None:
     utc_now = util.get_utc_now()
     fleet_names, user_names, data = collect_data(utc_now)
 
-    # TODO: output stuff
+    data_file_name = util.get_collect_file_name(utc_now)
 
+    if settings.store_at_filesystem:
+        util.update_data(fleet_names, settings.FILE_NAME_FLEET_NAMES, settings.DEFAULT_COLLECT_FOLDER)
+        util.update_data(user_names, settings.FILE_NAME_FLEET_NAMES, settings.DEFAULT_COLLECT_FOLDER)
+        util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)
 
-def store_fleet_names(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
-
-    pass
-
-
-def store_user_infos(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
-    pass
-
-
-def store_user_names(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
-    pass
+    if settings.store_at_gdrive:
+        gdrive.update_data(fleet_names, settings.FILE_NAME_FLEET_NAMES)
+        gdrive.update_data(user_names, settings.FILE_NAME_FLEET_NAMES)
+        gdrive.dump_data(data, data_file_name)

@@ -22,6 +22,11 @@ __initialized = False
 
 
 
+def __assert_initialized():
+    if __drive is None:
+        raise Exception('The __drive object has not been initialized, yet!')
+
+
 def create_service_account_credential_json():
     project_id = str(os.environ.get('GDRIVE_SERVICE_PROJECT_ID'))
     private_key_id = str(os.environ.get('GDRIVE_SERVICE_PRIVATE_KEY_ID'))
@@ -59,9 +64,8 @@ def create_service_account_settings_yaml():
     util.dbg(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
-def __assert_initialized():
-    if __drive is None:
-        raise Exception('The __drive object has not been initialized, yet!')
+def dump_data(data: list, file_name: str) -> None:
+    pass
 
 
 def list_files():
@@ -71,7 +75,11 @@ def list_files():
         print(f'title: {file_def["title"]}, id: {file_def["id"]}')
 
 
-def upload_file(file_name: str, content: str):
+def update_data(content: str, file_name: str) -> None:
+    pass
+
+
+def upload_file(content: str, file_name: str):
     __assert_initialized()
     file_info = {
         'title': file_name,
@@ -83,6 +91,9 @@ def upload_file(file_name: str, content: str):
     drive_file = __drive.CreateFile(file_info)
     drive_file.SetContentString(content)
     drive_file.Upload()
+
+
+
 
 
 def init(force: bool = False):

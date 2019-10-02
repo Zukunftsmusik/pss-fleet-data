@@ -10,7 +10,7 @@ IS_DEBUG = True
 # ---------- Obtain at timestamps ----------
 
 OBTAIN_AT_HOURS = []
-OBTAIN_AT_MINUTES = [59]
+OBTAIN_AT_MINUTES = [11, 59]
 OBTAIN_AT_SECOND = 00
 
 
@@ -44,6 +44,8 @@ COLUMN_NAME_USER_NAME = 'User Name'
 
 CREATE_FOLDERS_ON_COLLECT = ['./tourney-data']
 
+DEFAULT_COLLECT_FOLDER = './tourney-data'
+
 DEFAULT_DATA_FILE_PREFIX = 'tourney-data_'
 DEFAULT_DATA_FILE_SUFFIX = '.json'
 
@@ -51,10 +53,12 @@ DEFAULT_TABLE_STYLE = openpyxl.worksheet.table.TableStyleInfo(name="TableStyleMe
 
 DEFAULT_TIMEZONE = timezone.utc
 
-FILE_NAME_COLLECT_PREFIX = 'pss-fleet-data_'
-FILE_NAME_COLLECT_SUFFIX = '.xlsx'
-FILE_NAME_PROCESS_PREFIX = 'pss-top-100_'
-FILE_NAME_PROCESS_SUFFIX = '.json'
+FILE_NAME_FLEET_NAMES = 'fleet-names.json'
+FILE_NAME_USER_NAMES = 'user-names.json'
+FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
+FILE_NAME_COLLECT_SUFFIX = '.json'
+FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
+FILE_NAME_PROCESS_SUFFIX = '.xlsx'
 
 GDRIVE_FOLDER_ID = '10wOZgAQk_0St2Y_jC3UW497LVpBNxWmP'
 

@@ -6,7 +6,7 @@ import os
 import sys
 import time
 
-import alliances
+import fleet_data
 import gdrive
 import pydrive
 import settings
@@ -20,10 +20,10 @@ def main():
     while True:
         utc_now = util.get_utc_now()
         next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
-        obtain_data = util.should_obtain_data(utc_now) and latest_timestamp != next_timestamp
+        obtain_data = util.should_obtain_data(utc_now, settings.obtain_at_timestamps) and latest_timestamp != next_timestamp
         if obtain_data:
             latest_timestamp = next_timestamp
-            alliances.retrieve_and_store_user_infos()
+            fleet_data.retrieve_and_store_user_infos()
         else:
             utc_now = util.get_utc_now()
             next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
