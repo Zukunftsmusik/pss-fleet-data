@@ -206,6 +206,7 @@ def update_data(data: object, file_name: str, folder_path: str) -> None:
             err(f'Could not read old data from file at: {file_path}', error)
         else:
             data.extend(data_old)
+            data = list(set(data))
     dump_data(data, file_name, folder_path)
 
 

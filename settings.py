@@ -16,6 +16,7 @@ OBTAIN_AT_SECOND = 00
 
 # ---------- From env vars ----------
 
+GDRIVE_FOLDER_ID = str(os.environ.get('GDRIVE_FOLDER_ID'))
 GPAT = str(os.environ.get('GPAT')) # General Purpose Access Token
 
 
@@ -59,8 +60,6 @@ FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
 FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
 FILE_NAME_PROCESS_SUFFIX = '.xlsx'
-
-GDRIVE_FOLDER_ID = '10wOZgAQk_0St2Y_jC3UW497LVpBNxWmP'
 
 OBTAIN_THREAD_COUNT = 10
 

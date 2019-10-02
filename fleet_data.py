@@ -104,6 +104,6 @@ def retrieve_and_store_user_infos() -> None:
         util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)
 
     if settings.store_at_gdrive:
-        gdrive.update_data(fleet_names, settings.FILE_NAME_FLEET_NAMES)
-        gdrive.update_data(user_names, settings.FILE_NAME_FLEET_NAMES)
-        gdrive.dump_data(data, data_file_name)
+        gdrive.update_file(fleet_names, settings.FILE_NAME_FLEET_NAMES)
+        gdrive.update_file(user_names, settings.FILE_NAME_FLEET_NAMES)
+        gdrive.upload_file(data, data_file_name)

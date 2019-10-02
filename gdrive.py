@@ -4,8 +4,7 @@ import google.oauth2
 import googleapiclient.discovery
 import json
 import os
-from pydrive.auth import GoogleAuth, ServiceAccountCredentials
-from pydrive.drive import GoogleDrive
+import pydrive
 import urllib.parse
 import yaml
 
@@ -64,23 +63,38 @@ def create_service_account_settings_yaml():
     util.dbg(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
-def dump_data(data: list, file_name: str) -> None:
-    pass
+def get_first_file(folder_id: str, file_name: str) -> pydrive.files.GoogleDriveFile:
+    # {'q': "'folder_id' in parents and trashed=false and name='file_name'"}
+    __assert_initialized()
+    file_list = __drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false and name='{file_name}'"}).GetList()
+    for file_def in file_list:
+        return file_def
+    return None
 
 
-def list_files():
+def list_files_in_root():
     __assert_initialized()
     file_list = __drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
     for file_def in file_list:
         print(f'title: {file_def["title"]}, id: {file_def["id"]}')
 
 
-def update_data(content: str, file_name: str) -> None:
-    pass
+def update_file(data_new: list, file_name: str) -> None:
+    existing_file = get_first_file(settings.GDRIVE_FOLDER_ID, file_name)
+    if existing_file:
+        content_old = existing_file.GetContentString()
+        data_old = json.loads(content_old)
+        data_new.extend(data_old)
+        data_new = list(set(data_new))
+        content_new = json.dumps(data_new)
+        existing_file.SetContentString(content_new)
+    else:
+        upload_file(data_new, file_name)
 
 
-def upload_file(content: str, file_name: str):
+def upload_file(data: list, file_name: str) -> None:
     __assert_initialized()
+    content = json.dumps(data)
     file_info = {
         'title': file_name,
         'parents': [{
@@ -101,8 +115,8 @@ def init(force: bool = False):
     if (force or not __initialized) and settings.store_at_gdrive:
         create_service_account_credential_json()
         create_service_account_settings_yaml()
-        gauth = GoogleAuth()
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, SCOPES)
+        gauth = pydrive.auth.GoogleAuth()
+        credentials = pydrive.auth.ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, SCOPES)
         gauth.credentials = credentials
-        __drive = GoogleDrive(gauth)
+        __drive = pydrive.drive.GoogleDrive(gauth)
         __initialized = True
