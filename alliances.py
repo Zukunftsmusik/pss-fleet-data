@@ -1,8 +1,7 @@
-
-
+from datetime import datetime
 import json
 from multiprocessing.dummy import Pool as ThreadPool
-import pydrive
+import sys
 
 import gdrive
 import settings
@@ -12,80 +11,102 @@ import utility as util
 __runs = 0
 
 
+def collect_data(start_timestamp: datetime) -> (list, list, list):
+    """
+    Collects data and converts it.
 
-def get_alliances() -> dict:
-    path = f'AllianceService/ListAlliancesByRanking?skip=0&take=100'
-    return util.get_dict3_from_path(path, 'AllianceId')
+    Returns 3 lists:
+     - fleet names: (fleet_id, fleet_name)
+     - user_names: (user_id, user_name)
+     - data: (user_id, fleet_id, trophies, stars, rank, join_date, login_date)
+    """
+    is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
+    try:
+        fleet_infos = get_fleet_infos(is_tourney_running)
+    except Exception as error:
+        util.err(f'Could not retrieve fleet infos', error)
+        sys.exit()
+    else:
+        util.dbg(f'Retrieved {len(fleet_infos)} fleet infos after {util.get_elapsed_seconds(start_timestamp)} seconds.')
+
+    try:
+        user_infos_raw = get_fleets_user_infos_raw(fleet_infos)
+    except Exception as error:
+        util.err(f'Could not retrieve user infos. Exiting.', error)
+        sys.exit()
+    else:
+        util.dbg(f'Retrieved {len(user_infos_raw)} user infos after {util.get_elapsed_seconds(start_timestamp)} seconds.')
+    util.dbg(f'Processing raw data...')
+
+    user_infos = [util.xmltree_to_dict3(user_info_raw, 'Id') for user_info_raw in user_infos_raw]
+    fleet_names = [(fleet_info['AllianceId'], fleet_info['AllianceName']) for fleet_info in fleet_infos]
+    user_names = [(user_info['Id'], user_info['Name']) for user_info in user_infos]
+    output_timestamp = util.format_output_timestamp(start_timestamp)
+    data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos]
+
+    return (fleet_names, user_names, data)
 
 
-def get_alliance_users_path(alliance_id: str) -> str:
-    return f'{settings.ALLIANCE_USERS_BASE_PATH}{alliance_id}'
-
-
-def get_alliance_users_raw(alliance_id: str) -> str:
-    path = get_alliance_users_path(alliance_id)
-    return (alliance_id, util.get_data_from_path(path))
-
-
-def get_short_user_info(user_info: dict) -> dict:
-    result = {}
-    for source, target in settings.SHORT_USER_INFO_FIELDS.items():
-        result[target] = user_info[source]
+def get_fleet_infos(is_tourney_running: bool) -> dict:
+    if is_tourney_running:
+        result = get_tournament_fleets()
+    else:
+        result = get_fleets()
     return result
 
 
-def get_tournament_alliances() -> dict:
-    path = f'AllianceService/ListAlliancesWithDivision'
-    return util.get_dict3_from_path(path, 'AllianceId')
+def get_fleets() -> dict:
+    return util.get_dict3_from_path(settings.ALLIANCE_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME)
 
 
-def get_user_infos(is_tourney_running: bool) -> dict:
-    start = util.get_time()
-    if is_tourney_running:
-        alliance_infos = get_tournament_alliances()
-    else:
-        alliance_infos = get_alliances()
+def get_fleet_users_path(alliance_id: str) -> str:
+    result = f'{settings.ALLIANCE_USERS_BASE_PATH}{alliance_id}'
+    return result
 
-    pool = ThreadPool(settings.THREAD_COUNT)
-    alliance_user_infos_raw = pool.map(get_alliance_users_raw, alliance_infos.keys())
+
+def get_fleet_users_raw(alliance_id: str) -> str:
+    path = get_fleet_users_path(alliance_id)
+    return util.get_data_from_path(path)
+
+
+def get_short_user_info(timestamp: str, user_info: dict) -> dict:
+    result = []
+    for source_prop in settings.SHORT_USER_INFO_FIELDS:
+        result.append(user_info[source_prop])
+    return result
+
+
+def get_tournament_fleets() -> dict:
+    return util.get_dict3_from_path(settings.ALLIANCE_TOURNEY_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME)
+
+
+def get_fleets_user_infos_raw(fleet_infos: dict) -> list:
+    pool = ThreadPool(settings.OBTAIN_THREAD_COUNT)
+    result = pool.map(get_fleet_users_raw, fleet_infos.keys())
     pool.close()
     pool.join()
-
-    for alliance_id, user_infos_raw in alliance_user_infos_raw:
-        user_infos = util.xmltree_to_dict3(user_infos_raw, 'Id')
-        alliance_infos[alliance_id]['Users'] = user_infos
-
-    user_infos_count = sum([len(alliance_info['Users']) for alliance_info in alliance_infos.values()])
-    util.dbg(f'Retrieved {user_infos_count} user info entries in {util.get_elapsed_seconds(start):0.2f} seconds.')
-
-    result = {}
-    for alliance_info in alliance_infos.values():
-        for user_id, user_info in alliance_info['Users'].items():
-            suffix = 1
-            new_key = user_id
-            while new_key in result.keys():
-                suffix += 1
-                new_key = f'{user_id}_{suffix}'
-            result[new_key] = get_short_user_info(user_info)
-
+    result = list(result)
     return result
 
 
-def retrieve_and_store_user_infos(upload_to_gdrive: bool = False) -> None:
+def retrieve_and_store_user_infos() -> None:
     global __runs
     __runs += 1
     util.dbg(f'Starting data collection run {__runs}')
-    user_infos = []
     utc_now = util.get_utc_now()
-    is_tourney_running = util.is_tourney_running(utc_now=utc_now)
-    try:
-        user_infos = get_user_infos(is_tourney_running)
-    except Exception as error:
-        util.err(f'Could not retrieve user infos', error)
-    if user_infos:
-        file_content = json.dumps(user_infos)
-        file_name = util.get_output_file_name(utc_now)
-        if settings.STORE_AT_FILESYSTEM:
-            util.save_to_filesystem(file_content, file_name)
-        if settings.STORE_AT_GDRIVE:
-            util.save_to_gdrive(file_content, file_name)
+    fleet_names, user_names, data = collect_data(utc_now)
+
+    # TODO: output stuff
+
+
+def store_fleet_names(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
+
+    pass
+
+
+def store_user_infos(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
+    pass
+
+
+def store_user_names(data: list, store_at_filesystem: bool, store_at_gdrive: bool) -> None:
+    pass

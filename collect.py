@@ -19,14 +19,14 @@ def main():
 
     while True:
         utc_now = util.get_utc_now()
-        next_timestamp = util.get_next_matching_timestamp(utc_now)
+        next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
         obtain_data = util.should_obtain_data(utc_now) and latest_timestamp != next_timestamp
         if obtain_data:
             latest_timestamp = next_timestamp
             alliances.retrieve_and_store_user_infos()
         else:
             utc_now = util.get_utc_now()
-            next_timestamp = util.get_next_matching_timestamp(utc_now)
+            next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
             sleep_for_seconds = util.calculate_sleep_for_seconds(utc_now, next_timestamp)
             sleep_for_seconds -= utc_now.microsecond / 1000000
             if sleep_for_seconds < 0:
@@ -41,24 +41,23 @@ def init(store_at_filesystem: bool = True, store_at_gdrive: bool = True):
 
     if store_at_filesystem is not None:
         util.dbg(f'Store at filesystem: {store_at_filesystem}')
-        settings.STORE_AT_FILESYSTEM = store_at_filesystem
+        settings.store_at_fileystem = store_at_filesystem
     if store_at_gdrive is not None:
         util.dbg(f'Store at google drive: {store_at_gdrive}')
-        settings.STORE_AT_GDRIVE = store_at_gdrive
+        settings.store_at_gdrive = store_at_gdrive
 
-    if settings.FOLDERS_TO_BE_CREATED:
-        for folder_name in settings.FOLDERS_TO_BE_CREATED:
-            if not os.path.isdir(folder_name):
-                os.mkdir(folder_name)
+    for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
+        if not os.path.isdir(folder_name):
+            os.mkdir(folder_name)
 
 
 def print_help():
-    bool_values = list(settings.FALSE_VALUES)
-    bool_values.extend(settings.TRUE_VALUES)
+    bool_values = list(settings.CLI_FALSE_VALUES)
+    bool_values.extend(settings.CLI_TRUE_VALUES)
     print(f'Usage: main.py [-h] [-f <bool>] [-g <bool>]\n')
-    print(f'       -f:  <bool> store at file system (default is {settings.STORE_AT_FILESYSTEM})')
+    print(f'       -f:  <bool> store at file system (default is {settings.store_at_filesystem})')
     print(f'     --fs:  see option \'f\'')
-    print(f'       -g:  <bool> store at google drive (default is {settings.STORE_AT_GDRIVE})')
+    print(f'       -g:  <bool> store at google drive (default is {settings.store_at_gdrive})')
     print(f' --gdrive:  see option \'g\'')
     print(f'\nbool values: {", ".join(bool_values)}\n')
     sys.exit()
@@ -66,12 +65,13 @@ def print_help():
 
 def __check_bool_arg(arg: str) -> bool:
     arg = str(arg).lower()
-    if arg in settings.TRUE_VALUES:
+    if arg in settings.CLI_TRUE_VALUES:
         return True
-    elif arg in settings.FALSE_VALUES:
+    elif arg in settings.CLI_FALSE_VALUES:
         return False
     else:
         print_help()
+
 
 
 
