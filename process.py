@@ -4,10 +4,10 @@
 import getopt
 import json
 import os
+import pandas
 import sys
 
 import excel
-import filter_data
 import settings
 import utility as util
 
@@ -25,46 +25,14 @@ def main():
             except:
                 continue
             else:
-                if content and isinstance(content, dict):
-                    timestamp = util.extract_timestamp_from_file_name(file_name)
-                    raw_data[timestamp] = content
-    data = create_ordered_data(raw_data)
-    #data = filter_data.by_user_names(['Namith\u270c\ufe0e', '.Xeon.'], data)
+                if content and isinstance(content, (list, tuple)):
+                    raw_data[timestamp] = content[0]
+    data = excel.create_ordered_data(raw_data)
+
     if data:
         excel.create_xl_from_data(data, settings.process_output_file_name)
     else:
         util.prnt(f'No data match found')
-
-
-def create_ordered_data(raw_data: dict) -> list:
-    """ This function will output 1 dicts:
-         - Tournament data, with the following column format:
-           - output timestamp
-           - user id
-           - user name
-           - fleet id
-           - fleet name
-           - trophy count
-           - star count"""
-    tournament_data = [(
-        settings.COLUMN_NAME_TIMESTAMP,
-        settings.COLUMN_NAME_USER_ID,
-        settings.COLUMN_NAME_USER_NAME,
-        settings.COLUMN_NAME_FLEET_ID,
-        settings.COLUMN_NAME_FLEET_NAME,
-        settings.COLUMN_NAME_TROPHIES,
-        settings.COLUMN_NAME_STARS
-    )]
-    for timestamp, data in raw_data.items():
-        for user_id, tourney_data in data.items():
-            user_name = tourney_data['UserName']
-            fleet_id = tourney_data['AllianceId']
-            fleet_name = tourney_data['AllianceName']
-            trophies = tourney_data['Trophies']
-            stars = tourney_data['Stars']
-
-            tournament_data.append((timestamp, user_id, user_name, fleet_id, fleet_name, trophies, stars))
-    return tournament_data
 
 
 def init():
