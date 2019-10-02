@@ -13,9 +13,8 @@ __runs = 0
 
 
 
-
-def get_tournament_alliances() -> dict:
-    path = f'AllianceService/ListAlliancesWithDivision'
+def get_alliances() -> dict:
+    path = f'AllianceService/ListAlliancesByRanking?skip=0&take=100'
     return util.get_dict3_from_path(path, 'AllianceId')
 
 
@@ -35,9 +34,17 @@ def get_short_user_info(user_info: dict) -> dict:
     return result
 
 
-def get_user_infos() -> dict:
+def get_tournament_alliances() -> dict:
+    path = f'AllianceService/ListAlliancesWithDivision'
+    return util.get_dict3_from_path(path, 'AllianceId')
+
+
+def get_user_infos(is_tourney_running: bool) -> dict:
     start = util.get_time()
-    alliance_infos = get_tournament_alliances()
+    if is_tourney_running:
+        alliance_infos = get_tournament_alliances()
+    else:
+        alliance_infos = get_alliances()
 
     pool = ThreadPool(settings.THREAD_COUNT)
     alliance_user_infos_raw = pool.map(get_alliance_users_raw, alliance_infos.keys())
@@ -70,13 +77,14 @@ def retrieve_and_store_user_infos(upload_to_gdrive: bool = False) -> None:
     util.dbg(f'Starting data collection run {__runs}')
     user_infos = []
     utc_now = util.get_utc_now()
+    is_tourney_running = util.is_tourney_running(utc_now=utc_now)
     try:
-        user_infos = get_user_infos()
+        user_infos = get_user_infos(is_tourney_running)
     except Exception as error:
         util.err(f'Could not retrieve user infos', error)
     if user_infos:
         file_content = json.dumps(user_infos)
-        file_name = f'tourney-data_{util.format_datetime(utc_now)}.json'
+        file_name = util.get_output_file_name(utc_now)
         if settings.STORE_AT_FILESYSTEM:
             util.save_to_filesystem(file_content, file_name)
         if settings.STORE_AT_GDRIVE:

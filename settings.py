@@ -5,16 +5,18 @@ import os
 
 
 GDRIVE_FOLDER_ID = '10wOZgAQk_0St2Y_jC3UW497LVpBNxWmP'
-GPAT = str(os.environ.get('GPAT'))
+GPAT = str(os.environ.get('GPAT')) # General Purpose Access Token
 
 IS_DEBUG = True
 FOLDERS_TO_BE_CREATED = ['./tourney-data']
 OBTAIN_AT_HOURS = []
-OBTAIN_AT_MINUTES = [59]
+OBTAIN_AT_MINUTES = [39]
 OBTAIN_AT_SECOND = 00
 OBTAIN_AT_TIMESTAMPS = []
-STORE_AT_FILESYSTEM = False
-STORE_AT_GDRIVE = True
+OUTPUT_FILE_NAME_PREFIX = 'pss-top-100_'
+OUTPUT_FILE_NAME_SUFFIX = '.json'
+STORE_AT_FILESYSTEM = True
+STORE_AT_GDRIVE = False
 THREAD_COUNT = 10
 
 ALLIANCE_USERS_BASE_PATH = f'AllianceService/ListUsers?skip=0&take=100&accessToken={GPAT}&allianceId='
@@ -24,9 +26,12 @@ SHORT_USER_INFO_FIELDS = {
     'Name': 'UserName',
     'AllianceName': 'AllianceName',
     'Trophy': 'Trophies',
-    'AllianceScore': 'Stars'
+    'AllianceScore': 'Stars',
+    'AllianceJoinDate': 'Joined',
+    'LastLoginDate': 'LastLogin'
 }
 TD_ONE_DAY = timedelta(days=1)
+TD_ONE_WEEK = timedelta(days=7)
 TZ_UTC = timezone.utc
 
 TRUE_VALUES = ['y', 'yes', '1', 't', 'true']

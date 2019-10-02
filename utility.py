@@ -33,6 +33,18 @@ def err(msg: str, error: Exception) -> None:
     print(f'[{utc_now}] ERROR  {msg}: {error}')
 
 
+def format_datetime(dt: datetime) -> str:
+    return dt.strftime('%Y%m%d-%H%M%S')
+
+
+def get_current_tourney_start(utc_now: datetime = None):
+    if utc_now is None:
+        utc_now = get_utc_now()
+    first_of_next_month = get_first_of_next_month(utc_now=utc_now)
+    result = first_of_next_month - settings.TD_ONE_WEEK
+    return result
+
+
 def get_data_from_url(url: str) -> str:
     data = urllib.request.urlopen(url).read()
     return data.decode('utf-8')
@@ -57,6 +69,18 @@ def get_elapsed_seconds(start: float) -> float:
     return result
 
 
+def get_first_of_next_month(utc_now: datetime = None):
+    if utc_now is None:
+        utc_now = get_utc_now()
+    year = utc_now.year
+    month = utc_now.month + 1
+    if (month == 13):
+        year += 1
+        month = 1
+    result = datetime(year, month, 1, 0, 0, 0, 0, timezone.utc)
+    return result
+
+
 def get_next_matching_timestamp(utc_now: datetime) -> (int, int, int):
     max_hour = max([t[0] for t in settings.OBTAIN_AT_TIMESTAMPS])
     if utc_now.hour > max_hour:
@@ -75,6 +99,11 @@ def get_next_matching_timestamp(utc_now: datetime) -> (int, int, int):
                     return settings.OBTAIN_AT_TIMESTAMPS[(i + 1) % len(settings.OBTAIN_AT_TIMESTAMPS)]
 
 
+def get_output_file_name(utc_now: datetime) -> str:
+    result = f'{settings.OUTPUT_FILE_NAME_PREFIX}{format_datetime(utc_now)}{settings.OUTPUT_FILE_NAME_SUFFIX}'
+    return result
+
+
 def get_time() -> float:
     return time.time()
 
@@ -84,8 +113,13 @@ def get_utc_now() -> datetime:
     return result
 
 
-def format_datetime(dt: datetime) -> str:
-    return dt.strftime('%Y%m%d-%H%M%S')
+def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) -> bool:
+    if start_date is None:
+        start_date = get_current_tourney_start()
+    if utc_now is None:
+        utc_now = get_utc_now()
+
+    return start_date < utc_now
 
 
 def post_wait_message(sleep_for_seconds: float, timestamp: (int, int, int)) -> None:
