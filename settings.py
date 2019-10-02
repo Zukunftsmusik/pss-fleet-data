@@ -27,6 +27,7 @@ SHORT_USER_INFO_FIELDS = {
     'AllianceName': 'AllianceName',
     'Trophy': 'Trophies',
     'AllianceScore': 'Stars',
+    'AllianceMembership': 'Rank',
     'AllianceJoinDate': 'Joined',
     'LastLoginDate': 'LastLogin'
 }
