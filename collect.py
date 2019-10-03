@@ -38,12 +38,19 @@ def main(run_once: bool = None):
                 time.sleep(sleep_for_seconds)
 
 
-def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None):
+def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None):
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
 
     if verbose is not None:
         settings.print_verbose = verbose
+
+    if no_time is None:
+        util.vrbs(f'Print timestamps: {settings.print_timestamps}')
+    else:
+        print_timestamps = not no_time
+        util.vrbs(f'Print timestamps: {print_timestamps}')
+        settings.print_timestamps = print_timestamps
 
     if store_at_filesystem is None:
         util.vrbs(f'Store at filesystem: {settings.store_at_fileystem}')
@@ -67,11 +74,13 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
 def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
     bool_values.extend(settings.CLI_TRUE_VALUES)
-    print(f'Usage: collect.py [-fghv]\n')
-    print(f'-f:  store at file system')
-    print(f'-g:  store at google drive')
-    print(f'-h:  print this help')
-    print(f'-v:  verbose mode')
+    print(f'Usage: collect.py [-fghv] [--once] [--notime]\n')
+    print(f'-f:       Store at file system')
+    print(f'-g:       Store at google drive')
+    print(f'-h:       Print this help')
+    print(f'--notime: Suppress timestamps on cli output')
+    print(f'--once:   Run only once')
+    print(f'-v:       Verbose mode')
     print(f'\n')
     sys.exit()
 
@@ -89,13 +98,14 @@ def __check_bool_arg(arg: str) -> bool:
 
 
 if __name__ == '__main__':
+    no_time = False
     run_once = False
     store_at_filesystem = False
     store_at_gdrive = False
     verbose = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', 'once')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', 'oncenotime')
     except getopt.GetoptError:
         print_help()
     else:
@@ -108,8 +118,10 @@ if __name__ == '__main__':
                 print_help()
             elif opt == '--once':
                 run_once = True
+            elif opt == '--notime':
+                no_time = True
             elif opt == '-v':
                 verbose = True
 
-    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose)
+    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
     main(run_once=run_once)

@@ -49,8 +49,11 @@ def post_wait_message(sleep_for_seconds: float, timestamp: (int, int, int)) -> N
 
 
 def prnt(msg: str) -> None:
-    utc_now = get_utc_now()
-    print(f'[{utc_now}] {msg}')
+    if settings.print_timestamps:
+        utc_now = get_utc_now()
+        print(f'[{utc_now}] {msg}')
+    else:
+        print(msg)
 
 
 def vrbs(msg: str) -> None:

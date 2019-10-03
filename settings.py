@@ -91,6 +91,7 @@ TIMEDELTA_ONE_WEEK = timedelta(days=7)
 files_to_process = []
 
 process_output_file_name = ''
+print_timestamps = True
 print_verbose = False
 
 obtain_at_timestamps = []
