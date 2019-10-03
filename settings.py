@@ -7,11 +7,16 @@ import os
 IS_DEBUG = True
 
 
-# ---------- Obtain at timestamps ----------
+# ---------- Defaults ----------
+
+directory = f'{os.getcwd()}/'
 
 OBTAIN_AT_HOURS = []
-OBTAIN_AT_MINUTES = [11, 59]
+OBTAIN_AT_MINUTES = []
 OBTAIN_AT_SECOND = 00
+
+store_at_filesystem = True
+store_at_gdrive = False
 
 
 # ---------- From env vars ----------
@@ -29,17 +34,17 @@ ALLIANCE_USERS_BASE_PATH = f'AllianceService/ListUsers?skip=0&take=100&accessTok
 
 API_BASE_URL = 'https://api2.pixelstarships.com/'
 
-CLI_TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
 CLI_FALSE_VALUES = ['n', 'no', '0', 'f', 'false']
+CLI_TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
 
-COLUMN_FORMAT_NUMBER = '0'
 COLUMN_FORMAT_DATETIME = 'YYYY-MM-DD hh:MM:ss'
+COLUMN_FORMAT_NUMBER = '0'
 
 COLUMN_NAME_FLEET_ID = 'Fleet Id'
 COLUMN_NAME_FLEET_NAME = 'Fleet Name'
+COLUMN_NAME_STARS = 'Stars'
 COLUMN_NAME_TIMESTAMP = 'Timestamp'
 COLUMN_NAME_TROPHIES = 'Trophies'
-COLUMN_NAME_STARS = 'Stars'
 COLUMN_NAME_USER_ID = 'User Id'
 COLUMN_NAME_USER_NAME = 'User Name'
 
@@ -54,14 +59,14 @@ DEFAULT_TABLE_STYLE = openpyxl.worksheet.table.TableStyleInfo(name="TableStyleMe
 
 DEFAULT_TIMEZONE = timezone.utc
 
-FILE_NAME_FLEET_NAMES = 'fleet-names.json'
-FILE_NAME_USER_NAMES = 'user-names.json'
 FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
+FILE_NAME_FLEET_NAMES = 'fleet-names.json'
 FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
 FILE_NAME_PROCESS_SUFFIX = '.xlsx'
+FILE_NAME_USER_NAMES = 'user-names.json'
 
-OBTAIN_THREAD_COUNT = 10
+OBTAIN_USERS_THREAD_COUNT = 10
 
 OUTPUT_TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 
@@ -81,18 +86,16 @@ TIMEDELTA_ONE_DAY = timedelta(days=1)
 TIMEDELTA_ONE_WEEK = timedelta(days=7)
 
 
-# ---------- Variables ----------
-
-directory = f'{os.getcwd()}/'
+# ---------- Variables without defaults ----------
 
 files_to_process = []
 
 process_output_file_name = ''
+print_verbose = False
 
 obtain_at_timestamps = []
 
-store_at_filesystem = True
-store_at_gdrive = False
+
 
 if OBTAIN_AT_HOURS:
     for hour in OBTAIN_AT_HOURS:

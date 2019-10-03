@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+import itertools
 import json
 import os
 import time
@@ -50,6 +51,11 @@ def post_wait_message(sleep_for_seconds: float, timestamp: (int, int, int)) -> N
 def prnt(msg: str) -> None:
     utc_now = get_utc_now()
     print(f'[{utc_now}] {msg}')
+
+
+def vrbs(msg: str) -> None:
+    if settings.print_verbose:
+        print(msg)
 
 
 
@@ -148,8 +154,8 @@ def get_dict3_from_path(path: str, key_name: str) -> dict:
 def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
     if end is None:
         end = get_utc_now()
-    duration = end - start
-    result = duration.seconds
+    duration: timedelta = end - start
+    result = float(duration.seconds) + float(duration.microseconds) / 1000000
     return result
 
 
@@ -184,7 +190,7 @@ def save_to_gdrive(content: str, file_name: str) -> None:
     except Exception as error:
         err(f'Could not upload the file to google drive', error)
     else:
-        dbg(f'Successfully uploaded {file_name} to google drive.')
+        prnt(f'Successfully uploaded {file_name} to google drive.')
 
 
 def dump_data(data: object, file_name: str, folder_path: str) -> None:
@@ -206,7 +212,7 @@ def update_data(data: object, file_name: str, folder_path: str) -> None:
             err(f'Could not read old data from file at: {file_path}', error)
         else:
             data.extend(data_old)
-            data = list(set(data))
+            data = remove_duplicates(data)
     dump_data(data, file_name, folder_path)
 
 
@@ -232,6 +238,9 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
     return start_date < utc_now
 
 
+
+
+
 # ---------- Uncategorized ----------
 
 def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -> (int, int, int):
@@ -255,6 +264,18 @@ def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -
 
 def get_collect_file_name(utc_now: datetime) -> str:
     result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
+    return result
+
+
+def remove_duplicates(_from: list) -> list:
+    if not _from:
+        return _from
+
+    result = []
+    for item in _from:
+        if item not in result:
+            result.append(item)
+
     return result
 
 

@@ -4,7 +4,9 @@ import google.oauth2
 import googleapiclient.discovery
 import json
 import os
-import pydrive
+import pydrive.auth
+import pydrive.drive
+import pydrive.files
 import urllib.parse
 import yaml
 
@@ -46,7 +48,7 @@ def create_service_account_credential_json():
     contents['client_x509_cert_url'] = f'https://www.googleapis.com/robot/v1/metadata/x509/{urllib.parse.quote(client_email)}'
     with open(SERVICE_ACCOUNT_FILE, 'w+') as service_file:
         json.dump(contents, service_file, indent=2)
-    util.dbg(f'Created service account connection file at: {SERVICE_ACCOUNT_FILE}')
+    util.vrbs(f'Created service account connection file at: {SERVICE_ACCOUNT_FILE}')
 
 
 def create_service_account_settings_yaml():
@@ -60,7 +62,7 @@ def create_service_account_settings_yaml():
 
     with open(SETTINGS_FILE, 'w+') as settings_file:
         yaml.dump(contents, settings_file)
-    util.dbg(f'Created settings yaml file at: {SETTINGS_FILE}')
+    util.vrbs(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
 def get_first_file(folder_id: str, file_name: str) -> pydrive.files.GoogleDriveFile:

@@ -35,15 +35,20 @@ def main():
             time.sleep(sleep_for_seconds)
 
 
-def init(store_at_filesystem: bool = True, store_at_gdrive: bool = True):
+def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None):
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
 
-    if store_at_filesystem is not None:
-        util.dbg(f'Store at filesystem: {store_at_filesystem}')
+    if store_at_filesystem is None:
+        util.vrbs(f'Store at filesystem: {settings.store_at_fileystem}')
+    else:
+        util.vrbs(f'Store at filesystem: {store_at_filesystem}')
         settings.store_at_fileystem = store_at_filesystem
-    if store_at_gdrive is not None:
-        util.dbg(f'Store at google drive: {store_at_gdrive}')
+
+    if store_at_gdrive is None:
+        util.vrbs(f'Store at google drive: {settings.store_at_gdrive}')
+    else:
+        util.vrbs(f'Store at google drive: {store_at_gdrive}')
         settings.store_at_gdrive = store_at_gdrive
 
     for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
