@@ -14,25 +14,28 @@ import utility as util
 
 
 
-def main():
+def main(run_once: bool = None):
     latest_timestamp = None
 
-    while True:
-        utc_now = util.get_utc_now()
-        next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
-        obtain_data = util.should_obtain_data(utc_now, settings.obtain_at_timestamps) and latest_timestamp != next_timestamp
-        if obtain_data:
-            latest_timestamp = next_timestamp
-            fleet_data.retrieve_and_store_user_infos()
-        else:
+    if run_once:
+        fleet_data.retrieve_and_store_user_infos()
+    else:
+        while True:
             utc_now = util.get_utc_now()
             next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
-            sleep_for_seconds = util.calculate_sleep_for_seconds(utc_now, next_timestamp)
-            sleep_for_seconds -= utc_now.microsecond / 1000000
-            if sleep_for_seconds < 0:
-                sleep_for_seconds = 0
-            util.post_wait_message(sleep_for_seconds, next_timestamp)
-            time.sleep(sleep_for_seconds)
+            obtain_data = util.should_obtain_data(utc_now, settings.obtain_at_timestamps) and latest_timestamp != next_timestamp
+            if obtain_data:
+                latest_timestamp = next_timestamp
+                fleet_data.retrieve_and_store_user_infos()
+            else:
+                utc_now = util.get_utc_now()
+                next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
+                sleep_for_seconds = util.calculate_sleep_for_seconds(utc_now, next_timestamp)
+                sleep_for_seconds -= utc_now.microsecond / 1000000
+                if sleep_for_seconds < 0:
+                    sleep_for_seconds = 0
+                util.post_wait_message(sleep_for_seconds, next_timestamp)
+                time.sleep(sleep_for_seconds)
 
 
 def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None):
@@ -64,12 +67,12 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
 def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
     bool_values.extend(settings.CLI_TRUE_VALUES)
-    print(f'Usage: main.py [-h] [-f <bool>] [-g <bool>]\n')
-    print(f'       -f:  <bool> store at file system (default is {settings.store_at_filesystem})')
-    print(f'     --fs:  see option \'f\'')
-    print(f'       -g:  <bool> store at google drive (default is {settings.store_at_gdrive})')
-    print(f' --gdrive:  see option \'g\'')
-    print(f'\nbool values: {", ".join(bool_values)}\n')
+    print(f'Usage: collect.py [-fghv]\n')
+    print(f'-f:  store at file system')
+    print(f'-g:  store at google drive')
+    print(f'-h:  print this help')
+    print(f'-v:  verbose mode')
+    print(f'\n')
     sys.exit()
 
 
@@ -86,24 +89,27 @@ def __check_bool_arg(arg: str) -> bool:
 
 
 if __name__ == '__main__':
-    store_at_filesystem = None
-    store_at_gdrive = None
-    verbose = None
+    run_once = False
+    store_at_filesystem = False
+    store_at_gdrive = False
+    verbose = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvf:g:', '')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', 'once')
     except getopt.GetoptError:
         print_help()
     else:
         for opt, arg in opts:
-            if opt == '-h':
+            if opt == '-f':
+                store_at_filesystem = True
+            elif opt == '-g':
+                store_at_gdrive = True
+            elif opt == '-h':
                 print_help()
+            elif opt == '--once':
+                run_once = True
             elif opt == '-v':
                 verbose = True
-            elif opt == '-f':
-                store_at_filesystem = __check_bool_arg(arg)
-            elif opt == '-g':
-                store_at_gdrive = __check_bool_arg(arg)
 
     init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose)
-    main()
+    main(run_once=run_once)

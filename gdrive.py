@@ -68,7 +68,7 @@ def create_service_account_settings_yaml():
 def get_first_file(folder_id: str, file_name: str) -> pydrive.files.GoogleDriveFile:
     # {'q': "'folder_id' in parents and trashed=false and name='file_name'"}
     __assert_initialized()
-    file_list = __drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false and name='{file_name}'"}).GetList()
+    file_list = __drive.ListFile({'q': f"'{folder_id}' in parents and title = '{file_name}'"}).GetList()
     for file_def in file_list:
         return file_def
     return None
@@ -76,7 +76,7 @@ def get_first_file(folder_id: str, file_name: str) -> pydrive.files.GoogleDriveF
 
 def list_files_in_root():
     __assert_initialized()
-    file_list = __drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+    file_list = __drive.ListFile({'q': "'root' in parents"}).GetList()
     for file_def in file_list:
         print(f'title: {file_def["title"]}, id: {file_def["id"]}')
 
@@ -87,7 +87,7 @@ def update_file(data_new: list, file_name: str) -> None:
         content_old = existing_file.GetContentString()
         data_old = json.loads(content_old)
         data_new.extend(data_old)
-        data_new = list(set(data_new))
+        data_new = util.remove_duplicates(data_new)
         content_new = json.dumps(data_new)
         existing_file.SetContentString(content_new)
     else:
