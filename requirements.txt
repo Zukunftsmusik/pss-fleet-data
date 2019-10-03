@@ -1,4 +1,5 @@
+google-auth
+openpyxl
 pip
 pycrypto
 PyDrive
-google-auth
