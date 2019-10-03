@@ -53,6 +53,8 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
     else:
         util.vrbs(f'Store at google drive: {store_at_gdrive}')
         settings.store_at_gdrive = store_at_gdrive
+        if store_at_gdrive:
+            gdrive.init()
 
     for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
         if not os.path.isdir(folder_name):
