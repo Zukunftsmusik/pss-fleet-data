@@ -49,20 +49,20 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
         util.vrbs(f'Print timestamps: {settings.print_timestamps}')
     else:
         print_timestamps = not no_time
-        util.vrbs(f'Print timestamps: {print_timestamps}')
         settings.print_timestamps = print_timestamps
+        util.vrbs(f'Print timestamps: {print_timestamps}')
 
     if store_at_filesystem is None:
         util.vrbs(f'Store at filesystem: {settings.store_at_fileystem}')
     else:
-        util.vrbs(f'Store at filesystem: {store_at_filesystem}')
         settings.store_at_fileystem = store_at_filesystem
+        util.vrbs(f'Store at filesystem: {store_at_filesystem}')
 
     if store_at_gdrive is None:
         util.vrbs(f'Store at google drive: {settings.store_at_gdrive}')
     else:
-        util.vrbs(f'Store at google drive: {store_at_gdrive}')
         settings.store_at_gdrive = store_at_gdrive
+        util.vrbs(f'Store at google drive: {store_at_gdrive}')
         if store_at_gdrive:
             gdrive.init()
 
