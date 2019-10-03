@@ -39,6 +39,9 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
 
+    if verbose is not None:
+        settings.print_verbose = verbose
+
     if store_at_filesystem is None:
         util.vrbs(f'Store at filesystem: {settings.store_at_fileystem}')
     else:
@@ -50,9 +53,6 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
     else:
         util.vrbs(f'Store at google drive: {store_at_gdrive}')
         settings.store_at_gdrive = store_at_gdrive
-
-    if verbose is not None:
-        settings.print_verbose = verbose
 
     for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
         if not os.path.isdir(folder_name):

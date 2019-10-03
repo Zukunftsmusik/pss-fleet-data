@@ -55,7 +55,7 @@ def prnt(msg: str) -> None:
 
 def vrbs(msg: str) -> None:
     if settings.print_verbose:
-        print(msg)
+        prnt(msg)
 
 
 
