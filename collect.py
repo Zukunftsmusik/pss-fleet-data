@@ -105,7 +105,7 @@ if __name__ == '__main__':
     verbose = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', 'oncenotime')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', ['once', 'notime'])
     except getopt.GetoptError:
         print_help()
     else:
