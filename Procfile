@@ -1,1 +1,1 @@
-worker: python collect.py -f -g -v --notime
+worker: python collect.py -g -v --notime
