@@ -35,7 +35,7 @@ def main():
             time.sleep(sleep_for_seconds)
 
 
-def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None):
+def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None):
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
 
@@ -50,6 +50,9 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None):
     else:
         util.vrbs(f'Store at google drive: {store_at_gdrive}')
         settings.store_at_gdrive = store_at_gdrive
+
+    if verbose is not None:
+        settings.print_verbose = verbose
 
     for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
         if not os.path.isdir(folder_name):
@@ -83,20 +86,22 @@ def __check_bool_arg(arg: str) -> bool:
 if __name__ == '__main__':
     store_at_filesystem = None
     store_at_gdrive = None
+    verbose = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hf:g:', 'fs=gdrive=')
+        opts, args = getopt.getopt(sys.argv[1:], 'hvf:g:', '')
     except getopt.GetoptError:
         print_help()
     else:
         for opt, arg in opts:
             if opt == '-h':
                 print_help()
-                break
-            elif opt == '-f' or opt == '--fs':
+            elif opt == '-v':
+                verbose = True
+            elif opt == '-f':
                 store_at_filesystem = __check_bool_arg(arg)
-            elif opt == '-g' or opt == '--gdrive':
+            elif opt == '-g':
                 store_at_gdrive = __check_bool_arg(arg)
 
-    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive)
+    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose)
     main()
