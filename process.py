@@ -109,7 +109,7 @@ if __name__ == '__main__':
     verbose = None
 
     try:
-        opts, args = getopt.getopt(cli_args, 'hf:d:', ['notime'])
+        opts, args = getopt.getopt(cli_args, 'hf:d:g', ['notime'])
     except getopt.GetoptError:
         print_help()
     else:
@@ -129,8 +129,7 @@ if __name__ == '__main__':
                 no_time = True
             elif opt == '-v':
                 verbose = True
-
             i += 1
 
-    init(verbose=verbose)
+    init(verbose=verbose, no_time=no_time)
     main()
