@@ -35,9 +35,19 @@ def main():
         util.prnt(f'No data match found')
 
 
-def init():
+def init(verbose: bool = None, no_time: bool = None):
     working_directory = f'{os.getcwd()}/'
     sys.path.insert(0, working_directory)
+
+    if verbose is not None:
+        settings.print_verbose = verbose
+
+    if no_time is None:
+        util.vrbs(f'Print timestamps: {settings.print_timestamps}')
+    else:
+        print_timestamps = not no_time
+        settings.print_timestamps = print_timestamps
+        util.vrbs(f'Print timestamps: {print_timestamps}')
 
     if settings.directory:
         if not settings.files_to_process:
@@ -95,24 +105,32 @@ def print_help():
 
 if __name__ == '__main__':
     cli_args = sys.argv[1:]
+    no_time = None
+    verbose = None
+
     try:
-        opts, args = getopt.getopt(cli_args, 'hf:d:', 'files=dir=')
+        opts, args = getopt.getopt(cli_args, 'hf:d:', ['notime'])
     except getopt.GetoptError:
         print_help()
     else:
         i = 0
         while i < len(cli_args):
             opt = cli_args[i]
-            if opt == 'h':
+            if opt == '-h':
                 print_help()
-            if opt == '-f' or opt == '--files':
+            if opt == '-f':
                 i += 1
                 check_files_arg(cli_args[i:])
                 break
-            elif opt == '-d' or opt == '--dir':
+            elif opt == '-d':
                 i += 1
                 check_dir_arg(cli_args[i])
+            elif opt == '--notime':
+                no_time = True
+            elif opt == '-v':
+                verbose = True
+
             i += 1
 
-    init()
+    init(verbose=verbose)
     main()

@@ -98,6 +98,7 @@ def __check_bool_arg(arg: str) -> bool:
 
 
 if __name__ == '__main__':
+    cli_args = sys.argv[1:]
     no_time = False
     run_once = False
     store_at_filesystem = False
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     verbose = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hvfg', ['once', 'notime'])
+        opts, args = getopt.getopt(cli_args, 'hvfg', ['once', 'notime'])
     except getopt.GetoptError:
         print_help()
     else:
