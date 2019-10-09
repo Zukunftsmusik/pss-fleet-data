@@ -47,7 +47,7 @@ def collect_data(start_timestamp: datetime) -> dict:
     data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos.values()]
 
     meta_data = {
-        'timestamp': start_timestamp,
+        'timestamp': util.convert_timestamp_to_output(start_timestamp),
         'duration': retrieved_fleet_infos_after + retrieved_user_data_raw_after,
         'fleet_count': len(fleet_infos),
         'user_count': len(user_infos),
