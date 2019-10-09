@@ -11,7 +11,7 @@ import utility as util
 __runs = 0
 
 
-def collect_data(start_timestamp: datetime) -> (list, list, list):
+def collect_data(start_timestamp: datetime) -> dict:
     """
     Collects data and converts it.
 
@@ -36,23 +36,38 @@ def collect_data(start_timestamp: datetime) -> (list, list, list):
         util.err(f'Could not retrieve user infos. Exiting.', error)
         sys.exit()
     else:
-        retrieved_user_infos_after = util.get_elapsed_seconds(start_timestamp)
-        user_infos = convert_raw_user_infos(user_infos_raw)
-        util.vrbs(f'Retrieved {len(user_infos)} user infos after {retrieved_user_infos_after:0.2f} seconds.')
+        retrieved_user_data_raw_after = util.get_elapsed_seconds(start_timestamp)
+        user_infos = convert_user_data_raw(user_infos_raw)
+        util.vrbs(f'Retrieved {len(user_infos)} user infos after {retrieved_user_data_raw_after:0.2f} seconds.')
     util.prnt(f'Processing raw data...')
 
-    fleet_names = [[fleet_info['AllianceId'], fleet_info['AllianceName']] for fleet_info in fleet_infos.values()]
-    user_names = [[user_info['Id'], user_info['Name']] for user_info in user_infos.values()]
+    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score']] for fleet_info in fleet_infos.values()]
+    users = [[user_info['Id'], user_info['Name']] for user_info in user_infos.values()]
     output_timestamp = util.format_output_timestamp(start_timestamp)
     data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos.values()]
 
-    return (fleet_names, user_names, data)
+    meta_data = {
+        'timestamp': start_timestamp,
+        'duration': retrieved_fleet_infos_after + retrieved_user_data_raw_after,
+        'fleet_count': len(fleet_infos),
+        'user_count': len(user_infos),
+        'tourney_running': is_tourney_running
+    }
+
+    result = {
+        'meta': meta_data,
+        'fleets': fleets,
+        'users': users,
+        'data': data
+    }
+
+    return result
 
 
-def convert_raw_user_infos(fleet_users_infos_raw: list) -> dict:
+def convert_user_data_raw(fleets_users_data_raw: list) -> dict:
     result = {}
-    for fleet_users_info_raw in fleet_users_infos_raw:
-        user_infos = util.xmltree_to_dict3(fleet_users_info_raw, 'Id')
+    for user_data_raw in fleets_users_data_raw:
+        user_infos = util.xmltree_to_dict3(user_data_raw, 'Id')
         result.update(user_infos)
     return result
 
@@ -104,16 +119,12 @@ def retrieve_and_store_user_infos() -> None:
     __runs += 1
     util.prnt(f'Starting data collection run {__runs}')
     utc_now = util.get_utc_now()
-    fleet_names, user_names, data = collect_data(utc_now)
+    data = collect_data(utc_now)
 
     data_file_name = util.get_collect_file_name(utc_now)
 
     if settings.store_at_filesystem:
-        util.update_data(fleet_names, settings.FILE_NAME_FLEET_NAMES, settings.DEFAULT_COLLECT_FOLDER)
-        util.update_data(user_names, settings.FILE_NAME_USER_NAMES, settings.DEFAULT_COLLECT_FOLDER)
         util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)
 
     if settings.store_at_gdrive:
-        gdrive.update_file(fleet_names, settings.FILE_NAME_FLEET_NAMES)
-        gdrive.update_file(user_names, settings.FILE_NAME_USER_NAMES)
         gdrive.upload_file(data, data_file_name)
