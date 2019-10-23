@@ -127,4 +127,14 @@ def retrieve_and_store_user_infos() -> None:
         util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)
 
     if settings.store_at_gdrive:
-        gdrive.upload_file(data, data_file_name)
+        tries_left = 5
+        while tries_left > 0:
+            tries_left -= 1
+            try:
+                gdrive.upload_file(data, data_file_name)
+                tries_left = 0
+            except Exception as error:
+                if tries_left > 0:
+                    gdrive.init(force=True)
+                else:
+                    raise error
