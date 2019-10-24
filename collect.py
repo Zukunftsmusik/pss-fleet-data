@@ -73,20 +73,6 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
         if not os.path.isdir(folder_name):
             os.mkdir(folder_name)
 
-    create_ship_level_map()
-
-
-def create_ship_level_map():
-    util.vrbs('Creating the ship level map')
-    path = f'ShipService/ListAllShipDesigns2?languageKey=en&version='
-    raw_data = util.get_data_from_path(path)
-    util.dbg(f'Retrieved {len(raw_data)} bytes of raw data.')
-    ship_design_data = util.xmltree_to_dict3(raw_data, 'ShipDesignId')
-    util.dbg(f'Retrieved {len(ship_design_data)} ship design entries.')
-    for key, value in ship_design_data.items():
-        settings.ship_level_map[key] = value['ShipLevel']
-    util.vrbs('Created ship level map')
-
 
 def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
