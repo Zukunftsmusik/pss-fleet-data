@@ -12,8 +12,6 @@ import pydrive
 import settings
 import utility as util
 
-SECONDS_IN_20_MINUTES = 20 * 60
-
 
 def main(run_once: bool = None):
     latest_timestamp = None
@@ -35,8 +33,6 @@ def main(run_once: bool = None):
                 sleep_for_seconds -= utc_now.microsecond / 1000000
                 if sleep_for_seconds < 0:
                     sleep_for_seconds = 0
-                if sleep_for_seconds > SECONDS_IN_20_MINUTES:
-                    sleep_for_seconds = SECONDS_IN_20_MINUTES
                 util.post_wait_message(sleep_for_seconds, next_timestamp)
                 time.sleep(sleep_for_seconds)
 
