@@ -13,19 +13,8 @@ import utility as util
 
 
 def main():
-    raw_data = {}
-    for file_name in settings.files_to_process:
-        file_path = os.path.join(settings.directory, file_name)
-        timestamp = util.extract_timestamp_from_file_name(file_name)
-        content = None
-        with open(file_path, 'r') as data_file:
-            try:
-                content = json.load(data_file)
-            except:
-                continue
-            else:
-                if content and isinstance(content, (list, tuple)):
-                    raw_data[timestamp] = content[0]
+    raw_data = read_raw_data()
+    #raw_data = filter_by_fleet_name(raw_data, 'fallen angels')
     data = create_ordered_data(raw_data)
 
     if data:
@@ -118,7 +107,7 @@ def filter_by_fleet_name(raw_data: dict, fleet_name: str) -> dict:
 def __filter_by_fleet_name_v2(raw_data: dict, fleet_name: str) -> dict:
     fleet_name = fleet_name.lower()
 
-    filtered_meta_data = list(raw_data['meta'])
+    filtered_meta_data = dict(raw_data['meta'])
     filtered_fleets_data = list(raw_data['fleets'])
     filtered_users_data = list(raw_data['users'])
     filtered_data = list(raw_data['data'])
@@ -151,7 +140,7 @@ def filter_by_user_name(raw_data: dict, user_name: str) -> dict:
 def __filter_by_user_name_v2(raw_data: dict, user_name: str) -> dict:
     user_name = user_name.lower()
 
-    filtered_meta_data = list(raw_data['meta'])
+    filtered_meta_data = dict(raw_data['meta'])
     filtered_fleets_data = list(raw_data['fleets'])
     filtered_users_data = list(raw_data['users'])
     filtered_data = list(raw_data['data'])
@@ -188,7 +177,7 @@ def __get_fleets_data_v2(raw_data: dict) -> dict:
     for fleet_info in fleets_data:
         fleet_id = fleet_info[0]
         fleet_name = fleet_info[1]
-        fleet_trophies = sum([data_point[2] for data_point in data if data_point[1] == fleet_id])
+        fleet_trophies = sum([int(data_point[2]) for data_point in data if data_point[1] == fleet_id])
         fleet_stars = fleet_info[2]
         result.append((meta_data['timestamp'], fleet_name, fleet_trophies, fleet_stars))
     return result
@@ -197,12 +186,12 @@ def __get_fleets_data_v2(raw_data: dict) -> dict:
 def _get_ordered_details(raw_data: dict, data_type: str) -> list:
     result = []
     if data_type in settings.DATA_OUTPUT_SCHEMA.keys():
-        result = list(settings.DATA_OUTPUT_SCHEMA[data_type].keys())
+        result = [list(settings.DATA_OUTPUT_SCHEMA[data_type].keys())]
 
         for raw_data_session in raw_data.values():
             schema_version = __get_schema_version(raw_data_session)
-            if schema_version in FUNCTION_MAPPING[data_type].keys() and data_type in FUNCTION_MAPPING[schema_version].keys():
-                transform_function = FUNCTION_MAPPING[data_type][schema_version]
+            if schema_version in FUNCTION_MAPPING.keys() and data_type in FUNCTION_MAPPING[schema_version].keys():
+                transform_function = FUNCTION_MAPPING[schema_version][data_type]
                 result.extend(transform_function(raw_data_session))
 
     return result
@@ -221,11 +210,11 @@ def __get_users_data_v2(raw_data: dict) -> dict:
         fleet_info = [fleets_data_point for fleets_data_point in fleets_data if fleets_data_point[0] == fleet_id][0]
         fleet_name = fleet_info[1]
         user_name = user_info[1]
-        rank = user_info[4]
-        last_login = user_info[6]
-        trophies = user_info[2]
-        stars = user_info[3]
-        join_date = user_info[5]
+        rank = data_point[4]
+        last_login = util.format_output_timestamp(util.parse_pss_timestamp(data_point[6]))
+        trophies = data_point[2]
+        stars = data_point[3]
+        join_date = util.format_output_timestamp(util.parse_pss_timestamp(data_point[5]))
         result.append((meta_data['timestamp'], fleet_name, user_name, rank, last_login, trophies, stars, join_date))
     return result
 
@@ -238,6 +227,48 @@ def print_help():
     print(f'  --files:  see option \'f\'')
     print('')
     sys.exit()
+
+
+def read_raw_data():
+    raw_data = {}
+    for file_name in settings.files_to_process:
+        file_path = os.path.join(settings.directory, file_name)
+        timestamp = util.extract_timestamp_from_file_name(file_name)
+        content = None
+        with open(file_path, 'r') as data_file:
+            try:
+                content = json.load(data_file)
+            except:
+                continue
+            else:
+                if content:
+                    if isinstance(content, (list, tuple)):
+                        raw_data[timestamp] = content[0]
+                    elif isinstance(content, dict):
+                        raw_data[timestamp] = content
+    return raw_data
+
+
+def set_directory(directory_path: str):
+    settings.directory = directory_path
+    files = []
+    for _, _, files in os.walk(settings.directory):
+        break
+    settings.files_to_process = files
+
+
+def add_file_to_process(file_name: str):
+    if settings.directory:
+        if not settings.files_to_process:
+            settings.files_to_process = [file_name]
+        else:
+            settings.files_to_process.append(file_name)
+    else:
+        util.err(f'The directory has not been set.')
+
+
+def clear_files_to_process():
+    settings.files_to_process = []
 
 
 FUNCTION_MAPPING = {

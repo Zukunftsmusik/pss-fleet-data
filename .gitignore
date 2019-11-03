@@ -4,7 +4,7 @@
 client_secrets.json
 settings.yaml
 tourney-data/
-
+*.xls*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

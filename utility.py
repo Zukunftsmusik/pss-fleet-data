@@ -86,7 +86,7 @@ def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple, t
 
 def convert_file_timestamp_to_output(timestamp: str) -> str:
     dt = parse_file_timestamp(timestamp)
-    result = dt.strftime(settings.OUTPUT_TIMESTAMP_FORMAT)
+    result = dt.strftime(settings.TIMESTAMP_FORMAT_OUTPUT)
     return result
 
 
@@ -105,12 +105,12 @@ def extract_timestamp_from_file_name(file_name: str, prefix: str = None, suffix:
 
 
 def format_file_timestamp(timestamp: datetime) -> str:
-    result = timestamp.strftime(settings.SOURCE_FILE_NAME_DATETIME_FORMAT)
+    result = timestamp.strftime(settings.TIMESTAMP_FORMAT_SOURCE_FILE_NAME)
     return result
 
 
 def format_output_timestamp(timestamp: datetime) -> str:
-    result = timestamp.strftime(settings.OUTPUT_TIMESTAMP_FORMAT)
+    result = timestamp.strftime(settings.TIMESTAMP_FORMAT_OUTPUT)
     return result
 
 
@@ -132,12 +132,17 @@ def get_utc_now() -> datetime:
 
 
 def parse_file_timestamp(timestamp: str) -> datetime:
-    result = datetime.strptime(timestamp, settings.SOURCE_FILE_NAME_DATETIME_FORMAT)
+    result = datetime.strptime(timestamp, settings.TIMESTAMP_FORMAT_SOURCE_FILE_NAME)
     return result
 
 
 def parse_output_timestamp(timestamp: str) -> datetime:
-    result = datetime.strptime(timestamp, settings.OUTPUT_TIMESTAMP_FORMAT)
+    result = datetime.strptime(timestamp, settings.TIMESTAMP_FORMAT_OUTPUT)
+    return result
+
+
+def parse_pss_timestamp(timestamp: str) -> datetime:
+    result = datetime.strptime(timestamp, settings.TIMESTAMP_FORMAT_PSS)
     return result
 
 

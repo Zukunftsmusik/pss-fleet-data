@@ -73,8 +73,6 @@ FILE_NAME_USER_NAMES = 'user-names.json'
 
 OBTAIN_USERS_THREAD_COUNT = 10
 
-OUTPUT_TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
-
 SHORT_USER_INFO_FIELDS = [
     'Id',
     'AllianceId',
@@ -85,10 +83,13 @@ SHORT_USER_INFO_FIELDS = [
     'LastLoginDate'
 ]
 
-SOURCE_FILE_NAME_DATETIME_FORMAT = '%Y%m%d-%H%M%S'
 
 TIMEDELTA_ONE_DAY = timedelta(days=1)
 TIMEDELTA_ONE_WEEK = timedelta(days=7)
+
+TIMESTAMP_FORMAT_OUTPUT = '%Y-%m-%d %H:%M:%S'
+TIMESTAMP_FORMAT_PSS = '%Y-%m-%dT%H:%M:%S'
+TIMESTAMP_FORMAT_SOURCE_FILE_NAME = '%Y%m%d-%H%M%S'
 
 
 # ---------- Late binding constants ----------
