@@ -50,6 +50,9 @@ COLUMN_NAME_USER_NAME = 'User Name'
 
 CREATE_FOLDERS_ON_COLLECT = ['./tourney-data']
 
+DATA_TYPE_FLEETS = 'fleets'
+DATA_TYPE_USERS = 'users'
+
 DEFAULT_COLLECT_FOLDER = './tourney-data'
 
 DEFAULT_DATA_FILE_PREFIX = 'tourney-data_'
@@ -84,6 +87,32 @@ SOURCE_FILE_NAME_DATETIME_FORMAT = '%Y%m%d-%H%M%S'
 
 TIMEDELTA_ONE_DAY = timedelta(days=1)
 TIMEDELTA_ONE_WEEK = timedelta(days=7)
+
+
+# ---------- Late binding constants ----------
+
+# schema dict:
+# <data_type> : {
+#     <column_name>: (<excel cell format>, <custom transformation function>)
+#   }
+DATA_OUTPUT_SCHEMA = {
+    DATA_TYPE_FLEETS: {
+        'Timestamp': (COLUMN_FORMAT_DATETIME, None),
+        'Fleet name': (None, None),
+        'Trophies': (COLUMN_FORMAT_NUMBER, None),
+        'Stars': (COLUMN_FORMAT_NUMBER, None)
+    },
+    DATA_TYPE_USERS: {
+        'Timestamp': (COLUMN_FORMAT_DATETIME, None),
+        'Fleet name': (None, None),
+        'Player name': (None, None),
+        'Rank': (None, None),
+        'Last login': (COLUMN_FORMAT_DATETIME, None),
+        'Trophies': (COLUMN_FORMAT_NUMBER, None),
+        'Stars': (COLUMN_FORMAT_NUMBER, None),
+        'Join date': (COLUMN_FORMAT_DATETIME, None)
+    }
+}
 
 
 # ---------- Variables without defaults ----------

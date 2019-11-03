@@ -84,8 +84,8 @@ def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple, t
     return timespan.seconds
 
 
-def convert_timestamp_to_output(timestamp: str) -> str:
-    dt = datetime.strptime(timestamp, settings.SOURCE_FILE_NAME_DATETIME_FORMAT)
+def convert_file_timestamp_to_output(timestamp: str) -> str:
+    dt = parse_file_timestamp(timestamp)
     result = dt.strftime(settings.OUTPUT_TIMESTAMP_FORMAT)
     return result
 
@@ -114,7 +114,7 @@ def format_output_timestamp(timestamp: datetime) -> str:
     return result
 
 
-def get_first_of_next_month(utc_now: datetime = None):
+def get_first_of_next_month(utc_now: datetime = None) -> datetime:
     if utc_now is None:
         utc_now = get_utc_now()
     year = utc_now.year
@@ -128,6 +128,16 @@ def get_first_of_next_month(utc_now: datetime = None):
 
 def get_utc_now() -> datetime:
     result = datetime.now(settings.DEFAULT_TIMEZONE)
+    return result
+
+
+def parse_file_timestamp(timestamp: str) -> datetime:
+    result = datetime.strptime(timestamp, settings.SOURCE_FILE_NAME_DATETIME_FORMAT)
+    return result
+
+
+def parse_output_timestamp(timestamp: str) -> datetime:
+    result = datetime.strptime(timestamp, settings.OUTPUT_TIMESTAMP_FORMAT)
     return result
 
 
