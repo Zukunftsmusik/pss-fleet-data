@@ -100,8 +100,74 @@ def create_ordered_data(raw_data: dict) -> dict:
            - fleet trophy score
            - fleet star score """
     result = {}
-    result[settings.DATA_TYPE_FLEETS] = get_ordered_details(raw_data, settings.DATA_TYPE_FLEETS)
-    result[settings.DATA_TYPE_USERS] = get_ordered_details(raw_data, settings.DATA_TYPE_USERS)
+    result[settings.DATA_MAPPING_FLEETS] = _get_ordered_details(raw_data, settings.DATA_MAPPING_FLEETS)
+    result[settings.DATA_MAPPING_USERS] = _get_ordered_details(raw_data, settings.DATA_MAPPING_USERS)
+    return result
+
+
+def filter_by_fleet_name(raw_data: dict, fleet_name: str) -> dict:
+    result = {}
+    for timestamp, data in raw_data.items():
+        schema_version = __get_schema_version(data)
+        filter_function = FUNCTION_MAPPING[schema_version][settings.DATA_MAPPING_FLEETS_FILTER]
+        filtered_data = filter_function(data, fleet_name)
+        result[timestamp] = filtered_data
+    return result
+
+
+def __filter_by_fleet_name_v2(raw_data: dict, fleet_name: str) -> dict:
+    fleet_name = fleet_name.lower()
+
+    filtered_meta_data = list(raw_data['meta'])
+    filtered_fleets_data = list(raw_data['fleets'])
+    filtered_users_data = list(raw_data['users'])
+    filtered_data = list(raw_data['data'])
+
+    filtered_fleets_data = [fleet_info for fleet_info in filtered_fleets_data if fleet_name in fleet_info[1].lower()]
+    filtered_fleets_ids = list(set([fleet_info[0] for fleet_info in filtered_fleets_data]))
+    filtered_data = [data_point for data_point in filtered_data if data_point[1] in filtered_fleets_ids]
+    filtered_user_ids = list(set([data_point[0] for data_point in filtered_data]))
+    filtered_users_data = [user_info for user_info in filtered_users_data if user_info[0] in filtered_user_ids]
+
+    result = {
+        'meta': filtered_meta_data,
+        'fleets': filtered_fleets_data,
+        'users': filtered_users_data,
+        'data': filtered_data
+    }
+    return result
+
+
+def filter_by_user_name(raw_data: dict, user_name: str) -> dict:
+    result = {}
+    for timestamp, data in raw_data.items():
+        schema_version = __get_schema_version(data)
+        filter_function = FUNCTION_MAPPING[schema_version][settings.DATA_MAPPING_USERS_FILTER]
+        filtered_data = filter_function(data, user_name)
+        result[timestamp] = filtered_data
+    return result
+
+
+def __filter_by_user_name_v2(raw_data: dict, user_name: str) -> dict:
+    user_name = user_name.lower()
+
+    filtered_meta_data = list(raw_data['meta'])
+    filtered_fleets_data = list(raw_data['fleets'])
+    filtered_users_data = list(raw_data['users'])
+    filtered_data = list(raw_data['data'])
+
+    filtered_users_data = [user_info for user_info in filtered_users_data if user_name in user_info[1].lower()]
+    filtered_user_ids = list(set([data_point[0] for data_point in filtered_data]))
+    filtered_data = [data_point for data_point in filtered_data if data_point[0] in filtered_user_ids]
+    filtered_fleets_ids = list(set([data_point[1] for data_point in filtered_data]))
+    filtered_fleets_data = [fleet_info for fleet_info in filtered_fleets_data if fleet_info[0] in filtered_fleets_ids]
+
+    result = {
+        'meta': filtered_meta_data,
+        'fleets': filtered_fleets_data,
+        'users': filtered_users_data,
+        'data': filtered_data
+    }
     return result
 
 
@@ -114,7 +180,7 @@ def __get_schema_version(raw_data: dict) -> str:
     return result
 
 
-def get_fleets_data_v2(raw_data: dict) -> dict:
+def __get_fleets_data_v2(raw_data: dict) -> dict:
     meta_data = raw_data['meta']
     fleets_data = raw_data['fleets']
     data = raw_data['data']
@@ -128,21 +194,21 @@ def get_fleets_data_v2(raw_data: dict) -> dict:
     return result
 
 
-def get_ordered_details(raw_data: dict, data_type: str) -> list:
+def _get_ordered_details(raw_data: dict, data_type: str) -> list:
     result = []
-    if data_type in settings.DATA_OUTPUT_SCHEMA.keys() and data_type in FUNCTION_MAPPING.keys():
+    if data_type in settings.DATA_OUTPUT_SCHEMA.keys():
         result = list(settings.DATA_OUTPUT_SCHEMA[data_type].keys())
 
         for raw_data_session in raw_data.values():
             schema_version = __get_schema_version(raw_data_session)
-            if schema_version in FUNCTION_MAPPING[data_type].keys():
+            if schema_version in FUNCTION_MAPPING[data_type].keys() and data_type in FUNCTION_MAPPING[schema_version].keys():
                 transform_function = FUNCTION_MAPPING[data_type][schema_version]
                 result.extend(transform_function(raw_data_session))
 
     return result
 
 
-def get_users_data_v2(raw_data: dict) -> dict:
+def __get_users_data_v2(raw_data: dict) -> dict:
     meta_data = raw_data['meta']
     fleets_data = raw_data['fleets']
     users_data = raw_data['users']
@@ -175,11 +241,11 @@ def print_help():
 
 
 FUNCTION_MAPPING = {
-    settings.DATA_TYPE_FLEETS: {
-        "2": get_fleets_data_v2
-    },
-    settings.DATA_TYPE_USERS: {
-        "2": get_users_data_v2
+    "2": {
+        settings.DATA_MAPPING_FLEETS: __get_fleets_data_v2,
+        settings.DATA_MAPPING_FLEETS_FILTER: __filter_by_fleet_name_v2,
+        settings.DATA_MAPPING_USERS: __get_users_data_v2,
+        settings.DATA_MAPPING_USERS_FILTER: __filter_by_user_name_v2
     }
 }
 
