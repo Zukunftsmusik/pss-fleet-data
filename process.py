@@ -14,7 +14,7 @@ import utility as util
 
 def main():
     raw_data = read_raw_data()
-    #raw_data = filter_by_fleet_name(raw_data, 'fallen angels')
+    raw_data = filter_by_fleet_name(raw_data, 'fallen angels')
     data = create_ordered_data(raw_data)
 
     if data:
@@ -88,6 +88,7 @@ def create_ordered_data(raw_data: dict) -> dict:
            - fleet name
            - fleet trophy score
            - fleet star score """
+    util.vrbs(f'Creating ordered data from raw data.')
     result = {}
     result[settings.DATA_MAPPING_FLEETS] = _get_ordered_details(raw_data, settings.DATA_MAPPING_FLEETS)
     result[settings.DATA_MAPPING_USERS] = _get_ordered_details(raw_data, settings.DATA_MAPPING_USERS)
@@ -95,6 +96,7 @@ def create_ordered_data(raw_data: dict) -> dict:
 
 
 def filter_by_fleet_name(raw_data: dict, fleet_name: str) -> dict:
+    util.vrbs(f'Filtering raw data by fleet: \'{fleet_name}\'')
     result = {}
     for timestamp, data in raw_data.items():
         schema_version = __get_schema_version(data)
@@ -128,6 +130,7 @@ def __filter_by_fleet_name_v2(raw_data: dict, fleet_name: str) -> dict:
 
 
 def filter_by_user_name(raw_data: dict, user_name: str) -> dict:
+    util.vrbs(f'Filtering raw data by user: \'{user_name}\'')
     result = {}
     for timestamp, data in raw_data.items():
         schema_version = __get_schema_version(data)
@@ -230,6 +233,7 @@ def print_help():
 
 
 def read_raw_data():
+    util.prnt(f'Reading raw data from directory: {settings.directory}')
     raw_data = {}
     for file_name in settings.files_to_process:
         file_path = os.path.join(settings.directory, file_name)
