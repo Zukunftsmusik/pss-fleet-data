@@ -3,3 +3,4 @@ openpyxl
 pip
 pycrypto
 PyDrive
+requests
