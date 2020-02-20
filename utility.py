@@ -177,6 +177,15 @@ def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
     return result
 
 
+def xmltree_to_dict2(raw_text: str, key_name: str) -> dict:
+    root = xml.etree.ElementTree.fromstring(raw_text)
+    d = {}
+    for c in root:
+        for cc in c:
+            d[cc.attrib[key_name]] = cc.attrib
+    return d
+
+
 def xmltree_to_dict3(raw_text: str, key_name: str) -> dict:
     root = xml.etree.ElementTree.fromstring(raw_text)
     d = {}

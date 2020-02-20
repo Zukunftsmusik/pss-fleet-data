@@ -4,11 +4,13 @@ from multiprocessing.dummy import Pool as ThreadPool
 import sys
 
 import gdrive
+import pss_login as login
 import settings
 import utility as util
 
 
 __runs = 0
+__access_token: str = None
 
 
 def collect_data(start_timestamp: datetime) -> dict:
@@ -20,6 +22,10 @@ def collect_data(start_timestamp: datetime) -> dict:
      - user_names: (user_id, user_name)
      - data: (user_id, fleet_id, trophies, stars, rank, join_date, login_date)
     """
+    _, login_data = login.login('8a7e7f42ba7d')
+    global __access_token
+    __access_token = login_data['accessToken']
+
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
     try:
         fleet_infos = get_fleet_infos(is_tourney_running)
@@ -85,7 +91,7 @@ def get_fleets() -> dict:
 
 
 def get_fleet_users_path(alliance_id: str) -> str:
-    result = f'{settings.ALLIANCE_USERS_BASE_PATH}{alliance_id}'
+    result = f'AllianceService/ListUsers?skip=0&take=100&accessToken={__access_token}&allianceId={alliance_id}'
     return result
 
 
