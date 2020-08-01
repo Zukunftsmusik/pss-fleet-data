@@ -27,6 +27,7 @@ def collect_data(start_timestamp: datetime) -> dict:
     __access_token = login_data['accessToken']
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
+    is_tourney_running = True
     try:
         fleet_infos = get_fleet_infos(is_tourney_running)
     except Exception as error:
