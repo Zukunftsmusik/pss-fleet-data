@@ -151,20 +151,36 @@ def parse_pss_timestamp(timestamp: str) -> datetime:
 
 # ---------- Data Retrieval ----------
 
+def get_api_server() -> str:
+    url = f'{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}'
+    data = get_data_from_url(url)
+    d = xmltree_to_dict2(data, 'SettingId')
+    for latest_settings in d.values():
+        result = latest_settings.get('ProductionServer')
+        break
+    if result:
+        result = f'https://{result}/'
+    else:
+        result = settings.API_BASE_URL
+    return result
+
+
 def get_data_from_url(url: str) -> str:
     data = urllib.request.urlopen(url).read()
     return data.decode('utf-8')
 
 
-def get_data_from_path(path: str) -> str:
+def get_data_from_path(path: str, api_server: str = None) -> str:
+    if not api_server:
+        api_server = get_api_server()
     if path:
         path = path.strip('/')
-    url = f'{settings.API_BASE_URL}{path}'
+    url = f'{api_server}{path}'
     return get_data_from_url(url)
 
 
-def get_dict3_from_path(path: str, key_name: str) -> dict:
-    raw_data = get_data_from_path(path)
+def get_dict3_from_path(path: str, key_name: str, api_server: str) -> dict:
+    raw_data = get_data_from_path(path, api_server)
     result = xmltree_to_dict3(raw_data, key_name)
     return result
 

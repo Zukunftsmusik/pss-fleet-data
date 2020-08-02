@@ -32,7 +32,7 @@ ALLIANCE_INFO_PATH = 'AllianceService/ListAlliancesByRanking?skip=0&take=100'
 ALLIANCE_TOURNEY_INFO_PATH = 'AllianceService/ListAlliancesWithDivision'
 ALLIANCE_USERS_BASE_PATH = f'AllianceService/ListUsers?skip=0&take=100&accessToken={GPAT}&allianceId='
 
-API_BASE_URL = 'https://api2.pixelstarships.com/'
+API_BASE_URL = 'https://api.pixelstarships.com/'
 
 CLI_FALSE_VALUES = ['n', 'no', '0', 'f', 'false']
 CLI_TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
@@ -71,8 +71,11 @@ FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
 FILE_NAME_PROCESS_SUFFIX = '.xlsx'
 FILE_NAME_USER_NAMES = 'user-names.json'
 
+
 OBTAIN_USERS_THREAD_COUNT = 10
 
+
+SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='
 SHORT_USER_INFO_FIELDS = [
     'Id',
     'AllianceId',
@@ -80,7 +83,16 @@ SHORT_USER_INFO_FIELDS = [
     'AllianceScore',
     'AllianceMembership',
     'AllianceJoinDate',
-    'LastLoginDate'
+    'LastLoginDate',
+    'LastHeartBeatDate',
+    'CrewDonated',
+    'CrewReceived',
+	'PVPAttackWins',
+	'PVPAttackLosses',
+	'PVPAttackDraws',
+	'PVPDefenceWins',
+	'PVPDefenceLosses',
+	'PVPDefenceDraws'
 ]
 
 

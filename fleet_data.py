@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import repeat
 import json
 from multiprocessing.dummy import Pool as ThreadPool
 import sys
@@ -27,9 +28,9 @@ def collect_data(start_timestamp: datetime) -> dict:
     __access_token = login_data['accessToken']
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
-    is_tourney_running = True
+    api_server = util.get_api_server()
     try:
-        fleet_infos = get_fleet_infos(is_tourney_running)
+        fleet_infos = get_fleet_infos(is_tourney_running, api_server)
     except Exception as error:
         util.err(f'Could not retrieve fleet infos', error)
         sys.exit()
@@ -38,7 +39,7 @@ def collect_data(start_timestamp: datetime) -> dict:
         util.vrbs(f'Retrieved {len(fleet_infos)} fleet infos after {retrieved_fleet_infos_after:0.2f} seconds.')
 
     try:
-        user_infos_raw = get_fleets_user_infos_raw(fleet_infos)
+        user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server)
     except Exception as error:
         util.err(f'Could not retrieve user infos. Exiting.', error)
         sys.exit()
@@ -48,7 +49,7 @@ def collect_data(start_timestamp: datetime) -> dict:
         util.vrbs(f'Retrieved {len(user_infos)} user infos after {retrieved_user_data_raw_after:0.2f} seconds.')
     util.prnt(f'Processing raw data...')
 
-    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score'], fleet_info['DivisionDesignId']] for fleet_info in fleet_infos.values()]
+    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score'], fleet_info['DivisionDesignId'], fleet_info['Trophy']] for fleet_info in fleet_infos.values()]
     users = [[user_info['Id'], user_info['Name']] for user_info in user_infos.values()]
     output_timestamp = util.format_output_timestamp(start_timestamp)
     data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos.values()]
@@ -58,7 +59,8 @@ def collect_data(start_timestamp: datetime) -> dict:
         'duration': retrieved_fleet_infos_after + retrieved_user_data_raw_after,
         'fleet_count': len(fleet_infos),
         'user_count': len(user_infos),
-        'tourney_running': is_tourney_running
+        'tourney_running': is_tourney_running,
+        'schema_version': '5'
     }
 
     result = {
@@ -79,16 +81,16 @@ def convert_user_data_raw(fleets_users_data_raw: list) -> dict:
     return result
 
 
-def get_fleet_infos(is_tourney_running: bool) -> dict:
+def get_fleet_infos(is_tourney_running: bool, api_server: str) -> dict:
     if is_tourney_running:
-        result = get_tournament_fleets()
+        result = get_tournament_fleets(api_server)
     else:
-        result = get_fleets()
+        result = get_fleets(api_server)
     return result
 
 
-def get_fleets() -> dict:
-    return util.get_dict3_from_path(settings.ALLIANCE_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME)
+def get_fleets(api_server: str) -> dict:
+    return util.get_dict3_from_path(settings.ALLIANCE_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME, api_server)
 
 
 def get_fleet_users_path(alliance_id: str) -> str:
@@ -96,9 +98,9 @@ def get_fleet_users_path(alliance_id: str) -> str:
     return result
 
 
-def get_fleet_users_raw(alliance_id: str) -> str:
+def get_fleet_users_raw(alliance_id: str, api_server: str) -> str:
     path = get_fleet_users_path(alliance_id)
-    return util.get_data_from_path(path)
+    return util.get_data_from_path(path, api_server)
 
 
 def get_short_user_info(timestamp: str, user_info: dict) -> dict:
@@ -108,13 +110,14 @@ def get_short_user_info(timestamp: str, user_info: dict) -> dict:
     return result
 
 
-def get_tournament_fleets() -> dict:
-    return util.get_dict3_from_path(settings.ALLIANCE_TOURNEY_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME)
+def get_tournament_fleets(api_server: str) -> dict:
+    return util.get_dict3_from_path(settings.ALLIANCE_TOURNEY_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME, api_server)
 
 
-def get_fleets_user_infos_raw(fleet_infos: dict) -> list:
+def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str) -> list:
+    args = zip(list(fleet_infos.keys()), repeat(api_server))
     pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
-    result = pool.map(get_fleet_users_raw, fleet_infos.keys())
+    result = pool.starmap(get_fleet_users_raw, args)
     pool.close()
     pool.join()
     result = list(result)
