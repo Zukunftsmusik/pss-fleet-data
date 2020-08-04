@@ -118,7 +118,7 @@ Tuples with 16 values (all of type string)
 | 2 | AllianceId | int | User's fleet ID |  |
 | 3 | Trophy | int | User's trophy count |  |
 | 4 | AllianceScore | int | User's star count |  |
-| 5 | AllianceMembership | str | User's rank in the fleet |  |
+| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
 | 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
 | 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
 | 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
@@ -130,3 +130,14 @@ Tuples with 16 values (all of type string)
 | 14 | PVPDefenceWins | int | PvP defense wins |
 | 15 | PVPDefenceLosses | int | PvP defense losses |
 | 16 | PVPDefenceDraws | int | PvP defense draws |
+
+\* = The ranks are encoded:
+| rank | code |
+| --- | --- |
+| FleetAdmiral | 0 |
+| ViceAdmiral | 1 |
+| Commander | 2 |
+| Major | 3 |
+| Lieutenant | 4 |
+| Ensign | 5 |
+| Candidate | 6 |

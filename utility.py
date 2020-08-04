@@ -297,6 +297,12 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
 
 # ---------- Uncategorized ----------
 
+
+def get_collect_file_name(utc_now: datetime) -> str:
+    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
+    return result
+
+
 def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -> (int, int, int):
     obtain_at_timestamps = list(obtain_at_timestamps)
     max_hour = max([t[0] for t in obtain_at_timestamps])
@@ -316,8 +322,8 @@ def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -
                     return obtain_at_timestamps[(i + 1) % len(obtain_at_timestamps)]
 
 
-def get_collect_file_name(utc_now: datetime) -> str:
-    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
+def get_rank_number(rank: str) -> int:
+    result = settings.RANKS_LOOKUP[rank]
     return result
 
 

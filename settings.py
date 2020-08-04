@@ -87,6 +87,17 @@ OBTAIN_USERS_THREAD_COUNT = 10
 PSS_START_DATE = datetime(year=2016, month=1, day=6)
 
 
+RANKS_LOOKUP = {
+    'FleetAdmiral': 0,
+    'ViceAdmiral': 1,
+    'Commander': 2,
+    'Major': 3,
+    'Lieutenant': 4,
+    'Ensign': 5,
+    'Candidate': 6
+}
+
+
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='
 SHORT_USER_INFO_FIELDS = {
     'Id': int,
@@ -94,7 +105,7 @@ SHORT_USER_INFO_FIELDS = {
     'AllianceId': int,
     'Trophy': int,
     'AllianceScore': int,
-    'AllianceMembership': str,
+    'AllianceMembership': util.get_rank_number,
     'AllianceJoinDate': util.pss_timestamp_to_ordinal,
     'LastLoginDate': util.pss_timestamp_to_ordinal,
     'LastHeartBeatDate': util.pss_timestamp_to_ordinal,
