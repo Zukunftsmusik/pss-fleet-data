@@ -1,7 +1,6 @@
 
 
 from datetime import datetime, timedelta, timezone
-import openpyxl
 import os
 
 import utility as util
@@ -71,8 +70,6 @@ DEFAULT_COLLECT_FOLDER = './tourney-data'
 
 DEFAULT_DATA_FILE_PREFIX = 'tourney-data_'
 DEFAULT_DATA_FILE_SUFFIX = '.json'
-
-DEFAULT_TABLE_STYLE = openpyxl.worksheet.table.TableStyleInfo(name="TableStyleMedium2", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)
 
 DEFAULT_TIMEZONE = timezone.utc
 
