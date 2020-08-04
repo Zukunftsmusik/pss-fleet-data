@@ -1,10 +1,22 @@
 
 
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 import openpyxl
 import os
 
+import utility as util
+
 IS_DEBUG = True
+
+
+# ---------- Settings dict ----------
+
+SETTINGS = {
+    'print_timestamps': False,
+    'store_at_filesystem': False,
+    'store_at_gdrive': False,
+    'print_verbose': False
+}
 
 
 # ---------- Defaults ----------
@@ -12,10 +24,10 @@ IS_DEBUG = True
 directory = f'{os.getcwd()}/'
 
 OBTAIN_AT_HOURS = []
-OBTAIN_AT_MINUTES = [19, 39, 59]
+OBTAIN_AT_MINUTES = [9, 19, 29, 39, 49, 59]
 OBTAIN_AT_SECOND = 00
 
-store_at_filesystem = True
+store_at_filesystem = False
 store_at_gdrive = False
 
 
@@ -75,25 +87,29 @@ FILE_NAME_USER_NAMES = 'user-names.json'
 OBTAIN_USERS_THREAD_COUNT = 10
 
 
+PSS_START_DATE = datetime(year=2016, month=1, day=6)
+
+
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='
-SHORT_USER_INFO_FIELDS = [
-    'Id',
-    'AllianceId',
-    'Trophy',
-    'AllianceScore',
-    'AllianceMembership',
-    'AllianceJoinDate',
-    'LastLoginDate',
-    'LastHeartBeatDate',
-    'CrewDonated',
-    'CrewReceived',
-	'PVPAttackWins',
-	'PVPAttackLosses',
-	'PVPAttackDraws',
-	'PVPDefenceWins',
-	'PVPDefenceLosses',
-	'PVPDefenceDraws'
-]
+SHORT_USER_INFO_FIELDS = {
+    'Id': int,
+    'Name': str,
+    'AllianceId': int,
+    'Trophy': int,
+    'AllianceScore': int,
+    'AllianceMembership': str,
+    'AllianceJoinDate': util.pss_timestamp_to_ordinal,
+    'LastLoginDate': util.pss_timestamp_to_ordinal,
+    'LastHeartBeatDate': util.pss_timestamp_to_ordinal,
+    'CrewDonated': int,
+    'CrewReceived': int,
+	'PVPAttackWins': int,
+	'PVPAttackLosses': int,
+	'PVPAttackDraws': int,
+	'PVPDefenceWins': int,
+	'PVPDefenceLosses': int,
+	'PVPDefenceDraws': int
+}
 
 
 TIMEDELTA_ONE_DAY = timedelta(days=1)

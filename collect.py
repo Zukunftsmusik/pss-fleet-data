@@ -37,30 +37,31 @@ def main(run_once: bool = None):
                 time.sleep(sleep_for_seconds)
 
 
-def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None):
+def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None) -> dict:
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
 
+
     if verbose is not None:
-        settings.print_verbose = verbose
+        settings.SETTINGS['print_verbose'] = verbose
 
     if no_time is None:
-        util.vrbs(f'Print timestamps: {settings.print_timestamps}')
+        util.vrbs(f'Print timestamps: {settings.SETTINGS["print_timestamps"]}')
     else:
         print_timestamps = not no_time
-        settings.print_timestamps = print_timestamps
+        settings.SETTINGS['print_timestamps'] = print_timestamps
         util.vrbs(f'Print timestamps: {print_timestamps}')
 
     if store_at_filesystem is None:
-        util.vrbs(f'Store at filesystem: {settings.store_at_fileystem}')
+        util.vrbs(f'Store at filesystem: {settings.SETTINGS["store_at_fileystem"]}')
     else:
-        settings.store_at_fileystem = store_at_filesystem
+        settings.SETTINGS['store_at_filesystem'] = store_at_filesystem
         util.vrbs(f'Store at filesystem: {store_at_filesystem}')
 
     if store_at_gdrive is None:
-        util.vrbs(f'Store at google drive: {settings.store_at_gdrive}')
+        util.vrbs(f'Store at google drive: {settings.SETTINGS["store_at_gdrive"]}')
     else:
-        settings.store_at_gdrive = store_at_gdrive
+        settings.SETTINGS['store_at_gdrive'] = store_at_gdrive
         util.vrbs(f'Store at google drive: {store_at_gdrive}')
         if store_at_gdrive:
             gdrive.init()
@@ -123,5 +124,5 @@ if __name__ == '__main__':
             elif opt == '-v':
                 verbose = True
 
-    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
+    settings = init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
     main(run_once=run_once)

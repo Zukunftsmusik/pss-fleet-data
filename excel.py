@@ -1,6 +1,5 @@
 import openpyxl
 
-import settings
 import utility as util
 
 

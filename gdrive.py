@@ -104,9 +104,11 @@ def upload_file(data: list, file_name: str) -> None:
             'id': settings.GDRIVE_FOLDER_ID
         }]
     }
+    util.vrbs(f'Creating file on gdrive: {file_name}')
     drive_file = __drive.CreateFile(file_info)
     drive_file.SetContentString(content)
     drive_file.Upload()
+    util.vrbs(f'Uploaded file to gdrive: {file_name}')
 
 
 
@@ -114,7 +116,7 @@ def upload_file(data: list, file_name: str) -> None:
 
 def init(force: bool = False):
     global __drive, __initialized
-    if (force or not __initialized) and settings.store_at_gdrive:
+    if (force or not __initialized) and settings.SETTINGS['store_at_gdrive']:
         create_service_account_credential_json()
         create_service_account_settings_yaml()
         gauth = pydrive.auth.GoogleAuth()

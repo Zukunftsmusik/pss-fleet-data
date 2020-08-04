@@ -49,10 +49,8 @@ def collect_data(start_timestamp: datetime) -> dict:
         util.vrbs(f'Retrieved {len(user_infos)} user infos after {retrieved_user_data_raw_after:0.2f} seconds.')
     util.prnt(f'Processing raw data...')
 
-    fleets = [[fleet_info['AllianceId'], fleet_info['AllianceName'], fleet_info['Score'], fleet_info['DivisionDesignId'], fleet_info['Trophy']] for fleet_info in fleet_infos.values()]
-    users = [[user_info['Id'], user_info['Name']] for user_info in user_infos.values()]
-    output_timestamp = util.format_output_timestamp(start_timestamp)
-    data = [get_short_user_info(output_timestamp, user_info) for user_info in user_infos.values()]
+    fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
+    users = [get_short_user_info(user_info) for user_info in user_infos.values()]
 
     meta_data = {
         'timestamp': util.format_output_timestamp(start_timestamp),
@@ -60,14 +58,13 @@ def collect_data(start_timestamp: datetime) -> dict:
         'fleet_count': len(fleet_infos),
         'user_count': len(user_infos),
         'tourney_running': is_tourney_running,
-        'schema_version': '5'
+        'schema_version': 4
     }
 
     result = {
         'meta': meta_data,
         'fleets': fleets,
-        'users': users,
-        'data': data
+        'users': users
     }
 
     return result
@@ -103,10 +100,15 @@ def get_fleet_users_raw(alliance_id: str, api_server: str) -> str:
     return util.get_data_from_path(path, api_server)
 
 
-def get_short_user_info(timestamp: str, user_info: dict) -> dict:
+def get_short_fleet_info(fleet_info: dict) -> list:
+    result = [int(fleet_info['AllianceId']), fleet_info['AllianceName'], int(fleet_info['Score']), int(fleet_info['DivisionDesignId']), int(fleet_info['Trophy'])]
+    return result
+
+
+def get_short_user_info(user_info: dict) -> list:
     result = []
-    for source_prop in settings.SHORT_USER_INFO_FIELDS:
-        result.append(user_info[source_prop])
+    for source_prop, transform_function in settings.SHORT_USER_INFO_FIELDS.items():
+        result.append(transform_function(user_info[source_prop]))
     return result
 
 
@@ -133,10 +135,10 @@ def retrieve_and_store_user_infos() -> None:
 
     data_file_name = util.get_collect_file_name(utc_now)
 
-    if settings.store_at_filesystem:
+    if settings.SETTINGS['store_at_filesystem']:
         util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)
 
-    if settings.store_at_gdrive:
+    if settings.SETTINGS['store_at_gdrive']:
         tries_left = 5
         while tries_left > 0:
             tries_left -= 1

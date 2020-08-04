@@ -49,7 +49,7 @@ def post_wait_message(sleep_for_seconds: float, timestamp: (int, int, int)) -> N
 
 
 def prnt(msg: str) -> None:
-    if settings.print_timestamps:
+    if settings.SETTINGS['print_timestamps']:
         utc_now = get_utc_now()
         print(f'[{utc_now}] {msg}')
     else:
@@ -57,7 +57,7 @@ def prnt(msg: str) -> None:
 
 
 def vrbs(msg: str) -> None:
-    if settings.print_verbose:
+    if settings.SETTINGS['print_verbose']:
         prnt(msg)
 
 
@@ -88,6 +88,15 @@ def convert_file_timestamp_to_output(timestamp: str) -> str:
     dt = parse_file_timestamp(timestamp)
     result = dt.strftime(settings.TIMESTAMP_FORMAT_OUTPUT)
     return result
+
+
+def pss_timestamp_to_ordinal(timestamp: str) -> int:
+    dt = parse_pss_timestamp(timestamp)
+    if dt < settings.PSS_START_DATE:
+        return 0
+    else:
+        result = dt - settings.PSS_START_DATE
+        return result.seconds
 
 
 def extract_timestamp_from_file_name(file_name: str, prefix: str = None, suffix: str = None) -> str:
@@ -239,8 +248,10 @@ def save_to_gdrive(content: str, file_name: str) -> None:
 def dump_data(data: object, file_name: str, folder_path: str) -> None:
     file_path = os.path.join(folder_path, file_name)
     try:
+        vrbs(f'Start dumping data to file: {file_path}')
         with open(file_path, 'w+') as write_file:
             json.dump(data, write_file)
+        vrbs(f'Dumped data to file: {file_path}')
     except Exception as error:
         err(f'Could not create, open or write the file at: {file_path}', error)
 
