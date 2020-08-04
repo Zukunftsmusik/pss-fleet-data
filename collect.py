@@ -124,5 +124,5 @@ if __name__ == '__main__':
             elif opt == '-v':
                 verbose = True
 
-    settings = init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
+    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
     main(run_once=run_once)
