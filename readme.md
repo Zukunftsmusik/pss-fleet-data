@@ -78,6 +78,7 @@ This schema version is in use since August 2020. It's been introduced to store m
 
 ### NOTES
 All timestamps represent the number of full seconds since PSS officially started (2016-01-06 00:00:00 UTC).
+
 All tuples are represented as lists, since json doesn't know tuples.
 
 ### **meta data** object
@@ -85,7 +86,7 @@ All tuples are represented as lists, since json doesn't know tuples.
 dictionary
 #### Keys
 | key | data type | explanation |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | timestamp | timestamp | The point in time, when the run started |
 | duration | float | Duration of the collection run in seconds |
 | fleet_count | int | Number of fleets documented in this run |
@@ -131,6 +132,10 @@ Tuples with 16 values (all of type string)
 | 15 | PVPDefenceLosses | int | PvP defense losses |
 | 16 | PVPDefenceDraws | int | PvP defense draws |
 
+**NOTE**
+
+The timestamps `AllianceJoinDate`, `LastLoginDate` & `LastHeartBeatDate` are bugged with this schema. They don't contain the correct values.
+
 \* = The ranks are encoded:
 | rank | code |
 | --- | --- |
@@ -141,3 +146,7 @@ Tuples with 16 values (all of type string)
 | Lieutenant | 4 |
 | Ensign | 5 |
 | Candidate | 6 |
+
+## Schema version 4
+
+This schema version is in use since September 2020. It's been introduced to fix the timestamp bug in schema version 4.
