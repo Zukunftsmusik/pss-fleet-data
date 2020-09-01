@@ -96,7 +96,7 @@ def pss_timestamp_to_ordinal(timestamp: str) -> int:
         return 0
     else:
         result = dt - settings.PSS_START_DATE
-        return result.total_seconds()
+        return int(result.total_seconds())
 
 
 def extract_timestamp_from_file_name(file_name: str, prefix: str = None, suffix: str = None) -> str:
