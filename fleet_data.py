@@ -23,12 +23,12 @@ def collect_data(start_timestamp: datetime) -> dict:
      - user_names: (user_id, user_name)
      - data: (user_id, fleet_id, trophies, stars, rank, join_date, login_date)
     """
-    _, login_data = login.login('8a7e7f42ba7d')
+    api_server = util.get_api_server()
+    _, login_data = login.login('52806cee0b76', api_server)
     global __access_token
     __access_token = login_data['accessToken']
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
-    api_server = util.get_api_server()
     try:
         fleet_infos = get_fleet_infos(is_tourney_running, api_server)
     except Exception as error:

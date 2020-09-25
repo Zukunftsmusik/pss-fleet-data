@@ -32,15 +32,17 @@ def create_device_checksum(device_key: str) -> str:
     result = hashlib.md5((f'{device_key}DeviceTypeMacsavysoda').encode('utf-8')).hexdigest()
     return result
 
-def login(device_key: str = None) -> dict:
+def login(device_key: str = None, api_server: str = None) -> dict:
     if not device_key:
         device_key: str = create_device_key()
+    if not api_server:
+        api_server = util.get_api_server()
 
     checksum = create_device_checksum(device_key)
 
     path = f'UserService/DeviceLogin8?deviceKey={device_key}&isJailBroken=false&checksum={checksum}&deviceType=DeviceTypeMac&languageKey=en&advertisingkey=%22%22'
 
-    url = f'{settings.API_BASE_URL}/{path}'
+    url = f'{api_server}/{path}'
     data = requests.post(url).content.decode('utf-8')
 
     xml = ElementTree.fromstring(data)
