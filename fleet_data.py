@@ -24,7 +24,7 @@ def collect_data(start_timestamp: datetime) -> dict:
      - data: (user_id, fleet_id, trophies, stars, rank, join_date, login_date)
     """
     api_server = util.get_api_server()
-    _, login_data = login.login('52806cee0b76', api_server)
+    _, login_data = login.login(None, api_server)
     global __access_token
     __access_token = login_data['accessToken']
 
