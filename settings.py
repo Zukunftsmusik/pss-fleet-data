@@ -99,6 +99,14 @@ RANKS_LOOKUP = {
 
 
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='
+SHORT_ALLIANCE_INFO_FIELDS = {
+    'AllianceId': int,
+    'AllianceName': str,
+    'Score': int,
+    'DivisionDesignId': int,
+    'Trophy': int,
+    'ChampionshipScore': int,
+}
 SHORT_USER_INFO_FIELDS = {
     'Id': int,
     'Name': str,
@@ -116,7 +124,8 @@ SHORT_USER_INFO_FIELDS = {
 	'PVPAttackDraws': int,
 	'PVPDefenceWins': int,
 	'PVPDefenceLosses': int,
-	'PVPDefenceDraws': int
+	'PVPDefenceDraws': int,
+    'ChampionshipScore': int,
 }
 
 
@@ -126,6 +135,9 @@ TIMEDELTA_ONE_WEEK = timedelta(days=7)
 TIMESTAMP_FORMAT_OUTPUT = '%Y-%m-%d %H:%M:%S'
 TIMESTAMP_FORMAT_PSS = '%Y-%m-%dT%H:%M:%S'
 TIMESTAMP_FORMAT_SOURCE_FILE_NAME = '%Y%m%d-%H%M%S'
+
+
+USER_ID_KEY_NAME = 'Id'
 
 
 # ---------- Late binding constants ----------

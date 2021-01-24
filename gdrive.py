@@ -1,7 +1,3 @@
-
-
-import google.oauth2
-import googleapiclient.discovery
 import json
 import os
 import pydrive.auth

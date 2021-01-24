@@ -8,7 +8,6 @@ import time
 
 import fleet_data
 import gdrive
-import pydrive
 import settings
 import utility as util
 

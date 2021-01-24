@@ -1,13 +1,18 @@
 from datetime import datetime, timedelta, timezone
-import itertools
 import json
 import os
-import time
+from typing import Any, Dict, List, Tuple
 import urllib.request
 import xml.etree.ElementTree
 
 import gdrive
 import settings
+
+
+# ---------- Classes ----------
+
+class AccessTokenExpiredError(Exception):
+    pass
 
 
 
@@ -28,7 +33,7 @@ def err(msg: str, error: Exception = None) -> None:
     prnt(msg)
 
 
-def post_wait_message(sleep_for_seconds: float, timestamp: (int, int, int)) -> None:
+def post_wait_message(sleep_for_seconds: float, timestamp: Tuple[int, int, int]) -> None:
     minutes, seconds = divmod(sleep_for_seconds, 60)
     hours, minutes = divmod(minutes, 60)
     microseconds = int((seconds - int(seconds)) * 1000000)
@@ -123,6 +128,11 @@ def format_output_timestamp(timestamp: datetime) -> str:
     return result
 
 
+def format_pss_timestamp(timestamp: datetime) -> str:
+    result = timestamp.strftime(settings.TIMESTAMP_FORMAT_PSS)
+    return result
+
+
 def get_first_of_next_month(utc_now: datetime = None) -> datetime:
     if utc_now is None:
         utc_now = get_utc_now()
@@ -188,7 +198,13 @@ def get_data_from_path(path: str, api_server: str = None) -> str:
     return get_data_from_url(url)
 
 
-def get_dict3_from_path(path: str, key_name: str, api_server: str) -> dict:
+def get_dict2_from_path(path: str, key_name: str, api_server: str) -> Dict[str, dict]:
+    raw_data = get_data_from_path(path, api_server)
+    result = xmltree_to_dict2(raw_data, key_name)
+    return result
+
+
+def get_dict3_from_path(path: str, key_name: str, api_server: str) -> Dict[str, dict]:
     raw_data = get_data_from_path(path, api_server)
     result = xmltree_to_dict3(raw_data, key_name)
     return result
@@ -202,22 +218,28 @@ def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
     return result
 
 
-def xmltree_to_dict2(raw_text: str, key_name: str) -> dict:
+def xmltree_to_dict2(raw_text: str, key_name: str) -> Dict[str, dict]:
+    if 'Access token expired.' in raw_text:
+        raise AccessTokenExpiredError()
     root = xml.etree.ElementTree.fromstring(raw_text)
     d = {}
     for c in root:
         for cc in c:
-            d[cc.attrib[key_name]] = cc.attrib
+            if key_name in cc.attrib:
+                d[cc.attrib[key_name]] = cc.attrib
     return d
 
 
-def xmltree_to_dict3(raw_text: str, key_name: str) -> dict:
+def xmltree_to_dict3(raw_text: str, key_name: str) -> Dict[str, dict]:
+    if 'Access token expired.' in raw_text:
+        raise AccessTokenExpiredError()
     root = xml.etree.ElementTree.fromstring(raw_text)
     d = {}
     for c in root:
         for cc in c:
             for ccc in cc:
-                d[ccc.attrib[key_name]] = ccc.attrib
+                if key_name in ccc.attrib:
+                    d[ccc.attrib[key_name]] = ccc.attrib
     return d
 
 
@@ -275,7 +297,7 @@ def update_data(data: object, file_name: str, folder_path: str) -> None:
 
 # ---------- Tournament ----------
 
-def get_current_tourney_start(utc_now: datetime = None):
+def get_current_tourney_start(utc_now: datetime = None) -> datetime:
     if utc_now is None:
         utc_now = get_utc_now()
     first_of_next_month = get_first_of_next_month(utc_now=utc_now)
@@ -303,7 +325,7 @@ def get_collect_file_name(utc_now: datetime) -> str:
     return result
 
 
-def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: list) -> (int, int, int):
+def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: List[Tuple[int, int, int]]) -> Tuple[int, int, int]:
     obtain_at_timestamps = list(obtain_at_timestamps)
     max_hour = max([t[0] for t in obtain_at_timestamps])
     if utc_now.hour > max_hour:
@@ -327,7 +349,7 @@ def get_rank_number(rank: str) -> int:
     return result
 
 
-def remove_duplicates(_from: list) -> list:
+def remove_duplicates(_from: List[Any]) -> List[Any]:
     if not _from:
         return _from
 

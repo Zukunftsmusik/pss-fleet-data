@@ -1,5 +1,6 @@
 import hashlib
 import random
+from typing import Dict, Union
 import requests
 from xml.etree import ElementTree
 
@@ -9,8 +10,9 @@ import utility as util
 
 
 
-def create_device_checksum(device_key: str, device_type: str) -> str:
-    result = hashlib.md5((f'{device_key}{device_type}savysoda').encode('utf-8')).hexdigest()
+def create_device_checksum(device_key: str, device_type: str, client_datetime: str) -> str:
+    checksum_key = '5343'
+    result = hashlib.md5((f'{device_key}{client_datetime}{device_type}{checksum_key}savysoda').encode('utf-8')).hexdigest()
     return result
 
 
@@ -33,21 +35,32 @@ def create_device_key() -> str:
     return result
 
 
-def login(device_key: str = None, api_server: str = None, device_type: str = 'DeviceTypeMac') -> dict:
+def login(device_key: str = None, api_server: str = None, device_type: str = None, login_data: Dict[str, Union[dict, str]] = None) -> Dict[str, Union[dict, str]]:
     if not device_key:
-        device_key: str = create_device_key()
+        if login_data:
+            device_key = login_data['deviceKey']
+        else:
+            device_key: str = create_device_key()
+    if not device_type:
+        if login_data:
+            device_type = login_data['deviceType']
+        else:
+            device_type = 'DeviceTypeMac'
     if not api_server:
         api_server = util.get_api_server()
+    utc_now = util.get_utc_now()
+    client_datetime = util.format_pss_timestamp(utc_now)
 
     params = {
         'advertisingKey': '""',
-        'checksum': create_device_checksum(device_key, device_type),
+        'checksum': create_device_checksum(device_key, device_type, client_datetime),
+        'clientDateTime': client_datetime,
         'deviceKey': device_key,
         'deviceType': device_type,
         'isJailBroken': 'false',
         'languageKey': 'en'
     }
-    url = f'{api_server}/UserService/DeviceLogin8'
+    url = f'{api_server}/UserService/DeviceLogin11'
     data = requests.post(url, params=params).content.decode('utf-8')
 
     xml = ElementTree.fromstring(data)
@@ -58,7 +71,9 @@ def login(device_key: str = None, api_server: str = None, device_type: str = 'De
     result = {
         'User': users[user_id],
         'UserId': user_id,
-        'accessToken': access_token
+        'accessToken': access_token,
+        'deviceKey': device_key,
+        'deviceType': device_type,
     }
 
-    return device_key, result
+    return result
