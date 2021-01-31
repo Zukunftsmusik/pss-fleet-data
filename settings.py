@@ -45,6 +45,9 @@ ALLIANCE_USERS_BASE_PATH = f'AllianceService/ListUsers?skip=0&take=100&accessTok
 
 API_BASE_URL = 'https://api.pixelstarships.com/'
 
+
+CHECKSUM_KEY = str(os.environ.get('PSS_DEVICE_LOGIN_CHECKSUM_KEY'))
+
 CLI_FALSE_VALUES = ['n', 'no', '0', 'f', 'false']
 CLI_TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
 
@@ -61,6 +64,7 @@ COLUMN_NAME_USER_NAME = 'User Name'
 
 CREATE_FOLDERS_ON_COLLECT = ['./tourney-data']
 
+
 DATA_MAPPING_FLEETS = 'fleets'
 DATA_MAPPING_FLEETS_FILTER = 'fleets_filter'
 DATA_MAPPING_USERS = 'users'
@@ -72,6 +76,7 @@ DEFAULT_DATA_FILE_PREFIX = 'tourney-data_'
 DEFAULT_DATA_FILE_SUFFIX = '.json'
 
 DEFAULT_TIMEZONE = timezone.utc
+
 
 FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
