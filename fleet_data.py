@@ -163,6 +163,7 @@ def get_top_100_users_infos_raw(api_server: str) -> str:
 def retrieve_and_store_user_infos() -> None:
     global __runs
     __runs += 1
+    util.prnt(f'----------')
     util.prnt(f'Starting data collection run {__runs}')
     utc_now = util.get_utc_now()
     data = collect_data(utc_now)
