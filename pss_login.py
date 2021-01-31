@@ -4,6 +4,7 @@ from typing import Dict, Union
 import requests
 from xml.etree import ElementTree
 
+import settings
 import utility as util
 
 
@@ -11,8 +12,7 @@ import utility as util
 
 
 def create_device_checksum(device_key: str, device_type: str, client_datetime: str) -> str:
-    checksum_key = '5343'
-    result = hashlib.md5((f'{device_key}{client_datetime}{device_type}{checksum_key}savysoda').encode('utf-8')).hexdigest()
+    result = hashlib.md5((f'{device_key}{client_datetime}{device_type}{settings.CHECKSUM_KEY}savysoda').encode('utf-8')).hexdigest()
     return result
 
 
