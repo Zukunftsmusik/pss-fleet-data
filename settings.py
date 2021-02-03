@@ -93,6 +93,7 @@ PSS_START_DATE = datetime(year=2016, month=1, day=6)
 
 
 RANKS_LOOKUP = {
+    'None': -1,
     'FleetAdmiral': 0,
     'ViceAdmiral': 1,
     'Commander': 2,

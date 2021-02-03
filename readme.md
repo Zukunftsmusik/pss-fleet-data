@@ -128,6 +128,7 @@ The timestamps `AllianceJoinDate`, `LastLoginDate` & `LastHeartBeatDate` are bug
 \* = The ranks are encoded:
 | rank | code |
 | --- | --- |
+| None | -1 |
 | FleetAdmiral | 0 |
 | ViceAdmiral | 1 |
 | Commander | 2 |
