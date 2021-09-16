@@ -76,9 +76,6 @@ DEFAULT_DATA_FILE_SUFFIX = '.json'
 
 DEFAULT_TIMEZONE = timezone.utc
 
-"""List of device keys. If the list is empty, a random device key will be generated upon first login. Only 5 devices keys can be generated per day and IP."""
-FLEET_DATA_DEVICE_KEYS = json.loads(os.environ.get('FLEET_DATA_DEVICE_KEYS', '[]'))
-
 
 FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
@@ -86,6 +83,9 @@ FILE_NAME_FLEET_NAMES = 'fleet-names.json'
 FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
 FILE_NAME_PROCESS_SUFFIX = '.xlsx'
 FILE_NAME_USER_NAMES = 'user-names.json'
+
+"""List of device keys. If the list is empty, a random device key will be generated upon first login. Only 5 devices keys can be generated per day and IP."""
+FLEET_DATA_DEVICE_KEYS = json.loads(os.environ.get('FLEET_DATA_DEVICE_KEYS', '[]'))
 
 
 OBTAIN_USERS_THREAD_COUNT = 10
