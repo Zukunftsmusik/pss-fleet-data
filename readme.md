@@ -6,6 +6,33 @@ Collects data on top 100 / tournament fleets and their members hourly and stores
 
 Since October 2019, the fleet data consists of individual json files for each run, representing a dictionary containing multiple objects.
 
+## Schema version 7
+
+This schema is in use since September 2021. It adds the `NumberOfMembers` & `NumberOfApprovedMembers` to the fleets data.
+
+### **meta data** object
+_Unchanged_
+
+### **fleets** object
+#### Type
+list of tuples
+#### Contents
+Tuples with 5 values (all of type string)
+| index | fleet property key | data type | explanation |
+| --- | --- | --- | --- |
+| 0 | AllianceId | int | Fleet ID |
+| 1 | AllianceName | str | Fleet name |
+| 2 | Score | int | Fleet's star count |
+| 3 | DivisionDesignId | int | Division design ID |
+| 4 | Trophy | int | Fleet's trophy count |
+| 5 | ChampionshipScore | int | Tournament score determining the yearly rankings |
+| 6 | NumberOfMembers | int | Tournament score determining the yearly rankings |
+| 7 | NumberOfApprovedMembers | int | Tournament score determining the yearly rankings |
+
+### **users** object
+
+_Unchanged_, but will only hold top 100 players (without fleet affiliation), due to technical limitations in accessing the game's API.
+
 ## Schema version 6
 
 This schema is in use since January 2021. It adds the `ChampionshipScore` to the fleets and users data.

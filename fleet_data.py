@@ -15,7 +15,8 @@ __login_data: Dict[str, Union[dict, str]] = None
 
 def refresh_access_token(api_server: str) -> None:
     global __login_data
-    login_data = login.login(api_server=api_server, login_data=__login_data)
+    device_key = settings.FLEET_DATA_DEVICE_KEYS[0] if len(settings.FLEET_DATA_DEVICE_KEYS) else None
+    login_data = login.login(device_key=device_key, api_server=api_server, login_data=__login_data)
     __login_data = dict(login_data)
     util.dbg(f'Created access token for device: {login_data["deviceKey"]}')
     util.dbg(f'Current access token: {login_data["accessToken"]}')
@@ -43,41 +44,55 @@ def collect_data(start_timestamp: datetime) -> dict:
         retrieved_fleet_infos_after = util.get_elapsed_seconds(start_timestamp)
         util.vrbs(f'Retrieved {len(fleet_infos)} fleet infos after {retrieved_fleet_infos_after:0.2f} seconds.')
 
-    while True:
-        try:
-            top_100_users_infos_raw = get_top_100_users_infos_raw(api_server)
-        except Exception as error:
-            util.err(f'Could not retrieve user infos. Exiting.', error)
-            return None
-        if 'Access token expired.' in top_100_users_infos_raw:
-            refresh_access_token(api_server)
-        else:
-            break
+    if settings.RETRIEVE_TOP_USERS:
+        while True:
+            try:
+                top_100_users_infos_raw = get_top_100_users_infos_raw(api_server)
+            except Exception as error:
+                util.err(f'Could not retrieve user infos. Exiting.', error)
+                return None
+            if 'Access token expired.' in top_100_users_infos_raw:
+                refresh_access_token(api_server)
+            else:
+                break
 
-    retrieved_top_100_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
+        retrieved_top_100_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
 
-    while True:
-        try:
-            user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server)
-            break
-        except util.AccessTokenExpiredError:
-            refresh_access_token(api_server)
-        except Exception as error:
-            util.err(f'Could not retrieve user infos. Exiting.', error)
-            return None
+    if settings.RETRIEVE_FLEET_USERS:
+        while True:
+            try:
+                user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server)
+                break
+            except util.AccessTokenExpiredError:
+                refresh_access_token(api_server)
+            except Exception as error:
+                util.err(f'Could not retrieve user infos. Exiting.', error)
+                return None
+        retrieved_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
 
-    top_100_infos = convert_user_data_raw([top_100_users_infos_raw])
-    fleets_users_infos = convert_user_data_raw(user_infos_raw)
-    util.vrbs(f'Retrieved {len(top_100_infos)} top 100 user infos after {retrieved_top_100_user_infos_raw_after:0.2f} seconds.')
-    retrieved_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
-    util.vrbs(f'Retrieved {len(fleets_users_infos)} fleets user infos after {retrieved_user_infos_raw_after:0.2f} seconds.')
+    if settings.RETRIEVE_TOP_USERS:
+        top_100_users_infos = convert_user_data_raw([top_100_users_infos_raw])
+        util.vrbs(f'Retrieved {len(top_100_users_infos)} top 100 user infos after {retrieved_top_100_user_infos_raw_after:0.2f} seconds.')
+    else:
+        top_100_users_infos = {}
+    if settings.RETRIEVE_FLEET_USERS:
+        fleets_users_infos = convert_user_data_raw(user_infos_raw)
+        util.vrbs(f'Retrieved {len(fleets_users_infos)} fleets user infos after {retrieved_user_infos_raw_after:0.2f} seconds.')
+    else:
+        fleets_users_infos = {}
 
     util.prnt(f'Processing raw data...')
     user_infos = fleets_users_infos
-    for user_id, user_info in top_100_infos.items():
-        if user_id not in user_infos:
-            user_info = get_user_info_from_id(user_id, api_server)
-            user_infos[user_id] = user_info[user_id]
+
+    if settings.RETRIEVE_TOP_USERS:
+        if settings.RETRIEVE_TOP_USERS_DETAILS:
+            for user_id, top_100_user_info in top_100_users_infos.items():
+                if user_id not in user_infos:
+                    top_100_user_info = get_user_info_from_id(user_id, api_server)
+                    user_infos[user_id] = top_100_user_info[user_id]
+        else:
+            for user_id, top_100_user_info in top_100_users_infos.items():
+                user_infos[user_id] = {**(user_infos.get(user_id, {})), **top_100_user_info}
 
     fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
     users = [get_short_user_info(user_info) for user_info in user_infos.values()]
@@ -89,7 +104,7 @@ def collect_data(start_timestamp: datetime) -> dict:
         'fleet_count': len(fleets),
         'user_count': len(users),
         'tourney_running': is_tourney_running,
-        'schema_version': 6
+        'schema_version': 7
     }
 
     result = {

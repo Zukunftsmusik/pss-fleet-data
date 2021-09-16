@@ -1,6 +1,5 @@
-
-
 from datetime import datetime, timedelta, timezone
+import json
 import os
 
 import utility as util
@@ -77,6 +76,9 @@ DEFAULT_DATA_FILE_SUFFIX = '.json'
 
 DEFAULT_TIMEZONE = timezone.utc
 
+"""List of device keys. If the list is empty, a random device key will be generated upon first login. Only 5 devices keys can be generated per day and IP."""
+FLEET_DATA_DEVICE_KEYS = json.loads(os.environ.get('FLEET_DATA_DEVICE_KEYS', '[]'))
+
 
 FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
@@ -102,6 +104,9 @@ RANKS_LOOKUP = {
     'Ensign': 5,
     'Candidate': 6
 }
+RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 0)))
+RETRIEVE_TOP_USERS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS', 0)))
+RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS_DETAILS', 0)))
 
 
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='
@@ -112,6 +117,8 @@ SHORT_ALLIANCE_INFO_FIELDS = {
     'DivisionDesignId': int,
     'Trophy': int,
     'ChampionshipScore': int,
+    'NumberOfMembers': int,
+    'NumberOfApprovedMembers': int,
 }
 SHORT_USER_INFO_FIELDS = {
     'Id': int,
