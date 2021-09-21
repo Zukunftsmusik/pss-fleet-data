@@ -59,6 +59,11 @@ def collect_data(start_timestamp: datetime) -> dict:
         retrieved_top_100_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
 
     if settings.RETRIEVE_FLEET_USERS:
+        max_chunk_size = int(len(fleet_infos) / settings.RETRIEVE_FLEET_USERS_CHUNK_COUNT)
+        start_chunk_at = settings.RETRIEVE_FLEET_USERS_CHUNK_NO * max_chunk_size
+        end_chunk_at = min(len(fleet_infos), start_chunk_at + max_chunk_size)
+        fleet_infos = {fleet_id: fleet_info for (fleet_id, fleet_info) in list(fleet_infos.items())[start_chunk_at:end_chunk_at]}
+
         while True:
             try:
                 user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server)
@@ -184,7 +189,7 @@ def retrieve_and_store_user_infos() -> None:
     utc_now = util.get_utc_now()
     data = collect_data(utc_now)
 
-    data_file_name = util.get_collect_file_name(utc_now)
+    data_file_name = util.get_collect_file_name(utc_now, settings.RETRIEVE_FLEET_USERS_CHUNK_COUNT, settings.RETRIEVE_FLEET_USERS_CHUNK_NO)
 
     if settings.SETTINGS['store_at_filesystem']:
         util.dump_data(data, data_file_name, settings.DEFAULT_COLLECT_FOLDER)

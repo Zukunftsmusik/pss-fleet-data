@@ -105,6 +105,12 @@ RANKS_LOOKUP = {
     'Candidate': 6
 }
 RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 0)))
+RETRIEVE_FLEET_USERS_CHUNK_COUNT: int = \
+    int(os.environ.get('RETRIEVE_FLEET_USERS_CHUNK_COUNT', 1)) \
+    if RETRIEVE_FLEET_USERS else 1 # 1-based
+RETRIEVE_FLEET_USERS_CHUNK_NO: int = \
+    int(os.environ.get('RETRIEVE_FLEET_USERS_CHUNK_NO', 0)) \
+    if RETRIEVE_FLEET_USERS else 0 # 0-based
 RETRIEVE_TOP_USERS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS', 0)))
 RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS_DETAILS', 0)))
 
