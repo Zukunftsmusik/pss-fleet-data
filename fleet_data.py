@@ -92,7 +92,8 @@ def collect_data(start_timestamp: datetime) -> dict:
                     user_infos[user_id] = top_100_user_info[user_id]
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
-                user_infos[user_id] = {**(user_infos.get(user_id, {})), **top_100_user_info}
+                if user_id not in user_infos:
+                    user_infos[user_id] = top_100_user_info
 
     fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
     users = [get_short_user_info(user_info) for user_info in user_infos.values()]
