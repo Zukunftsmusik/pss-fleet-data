@@ -324,7 +324,7 @@ def get_collect_file_name(utc_now: datetime, chunk_count: int, chunk_no: int) ->
     chunk_suffix = ''
     if chunk_count and chunk_count > 1:
         chunk_suffix = f'{chunk_no}of{chunk_count}'
-    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{chunk_suffix}{settings.FILE_NAME_COLLECT_SUFFIX}'
+    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}-{chunk_suffix}{settings.FILE_NAME_COLLECT_SUFFIX}'
     return result
 
 
