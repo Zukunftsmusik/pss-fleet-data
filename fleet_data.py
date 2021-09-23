@@ -49,8 +49,7 @@ def collect_data(start_timestamp: datetime) -> dict:
             try:
                 top_100_users_infos_raw = get_top_100_users_infos_raw(api_server)
             except Exception as error:
-                util.err(f'Could not retrieve user infos. Exiting.', error)
-                return None
+                util.err(f'Could not retrieve user infos.', error)
             if 'Access token expired.' in top_100_users_infos_raw:
                 refresh_access_token(api_server)
             else:
@@ -72,8 +71,7 @@ def collect_data(start_timestamp: datetime) -> dict:
             except util.AccessTokenExpiredError:
                 refresh_access_token(api_server)
             except Exception as error:
-                util.err(f'Could not retrieve user infos. Exiting.', error)
-                return None
+                util.err(f'Could not retrieve user infos.', error)
         retrieved_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
 
     if settings.RETRIEVE_TOP_USERS:
@@ -95,7 +93,8 @@ def collect_data(start_timestamp: datetime) -> dict:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
                     top_100_user_info = get_user_info_from_id(user_id, api_server)
-                    user_infos[user_id] = top_100_user_info[user_id]
+                    if top_100_user_info:
+                        user_infos[user_id] = top_100_user_info[user_id]
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
@@ -126,7 +125,10 @@ def collect_data(start_timestamp: datetime) -> dict:
 def convert_user_data_raw(fleets_users_data_raw: list) -> Dict[str, dict]:
     result = {}
     for user_data_raw in fleets_users_data_raw:
-        user_infos = util.xmltree_to_dict3(user_data_raw, 'Id')
+        try:
+            user_infos = util.xmltree_to_dict3(user_data_raw, 'Id')
+        except:
+            user_infos = {}
         result.update(user_infos)
     return result
 
@@ -150,7 +152,11 @@ def get_fleet_users_path(alliance_id: str) -> str:
 
 def get_fleet_users_raw(alliance_id: str, api_server: str) -> str:
     path = get_fleet_users_path(alliance_id)
-    return util.get_data_from_path(path, api_server)
+    try:
+        result = util.get_data_from_path(path, api_server)
+    except:
+        result = ''
+    return result
 
 
 def get_short_fleet_info(fleet_info: dict) -> List[Union[int, str]]:
@@ -211,5 +217,8 @@ def retrieve_and_store_user_infos() -> None:
 
 def get_user_info_from_id(user_id: str, api_server: str) -> dict:
     path = f'ShipService/InspectShip2?accessToken={__login_data["accessToken"]}&userId={user_id}'
-    result = util.get_dict2_from_path(path, settings.USER_ID_KEY_NAME, api_server)
+    try:
+        result = util.get_dict2_from_path(path, settings.USER_ID_KEY_NAME, api_server)
+    except:
+        result = {}
     return result
