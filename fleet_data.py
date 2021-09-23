@@ -62,7 +62,8 @@ def collect_data(start_timestamp: datetime) -> dict:
         max_chunk_size = int(len(fleet_infos) / settings.RETRIEVE_FLEET_USERS_CHUNK_COUNT)
         start_chunk_at = settings.RETRIEVE_FLEET_USERS_CHUNK_NO * max_chunk_size
         end_chunk_at = min(len(fleet_infos), start_chunk_at + max_chunk_size)
-        fleet_infos = {fleet_id: fleet_info for (fleet_id, fleet_info) in list(fleet_infos.items())[start_chunk_at:end_chunk_at]}
+        fleet_info_tuples = sorted(list(fleet_infos.items()), key=lambda x: (x[1]['DivisionDesignId'], -int(x[1]['Score'])))
+        fleet_infos = {fleet_id: fleet_info for (fleet_id, fleet_info) in fleet_info_tuples[start_chunk_at:end_chunk_at]}
 
         while True:
             try:
