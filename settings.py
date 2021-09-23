@@ -32,7 +32,7 @@ store_at_gdrive = False
 # ---------- From env vars ----------
 
 GDRIVE_FOLDER_ID = str(os.environ.get('GDRIVE_FOLDER_ID'))
-GPAT = str(os.environ.get('GPAT')) # General Purpose Access Token
+GPAT = 'bf9ef038-318f-4368-a295-c0de9c24cfd7'
 
 
 # ---------- Constants ----------
@@ -88,7 +88,7 @@ FILE_NAME_USER_NAMES = 'user-names.json'
 FLEET_DATA_DEVICE_KEYS = json.loads(os.environ.get('FLEET_DATA_DEVICE_KEYS', '[]'))
 
 
-OBTAIN_USERS_THREAD_COUNT = 10
+OBTAIN_USERS_THREAD_COUNT = 1
 
 
 PSS_START_DATE = datetime(year=2016, month=1, day=6)
@@ -104,7 +104,7 @@ RANKS_LOOKUP = {
     'Ensign': 5,
     'Candidate': 6
 }
-RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 0)))
+RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 1)))
 RETRIEVE_TOP_USERS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS', 0)))
 RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS_DETAILS', 0)))
 

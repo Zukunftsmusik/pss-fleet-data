@@ -163,11 +163,19 @@ def get_tournament_fleets(api_server: str) -> Dict[str, dict]:
 
 def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str) -> List[str]:
     args = zip(list(fleet_infos.keys()), repeat(api_server))
-    pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
+    result = []
+    for i, arg in enumerate(args):
+        try:
+            fleet_users_infos_raw = get_fleet_users_raw(*arg)
+        except Exception as error:
+            util.err(f'Could not retrieve user infos after try {i}. Exiting.', error)
+            break
+        result.append(fleet_users_infos_raw)
+    """pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
     result = pool.starmap(get_fleet_users_raw, args)
     pool.close()
     pool.join()
-    result = list(result)
+    result = list(result)"""
     return result
 
 
