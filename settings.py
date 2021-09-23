@@ -22,7 +22,7 @@ SETTINGS = {
 directory = f'{os.getcwd()}/'
 
 OBTAIN_AT_HOURS = []
-OBTAIN_AT_MINUTES = [29, 59]
+OBTAIN_AT_MINUTES = [59]
 OBTAIN_AT_SECOND = 00
 
 store_at_filesystem = False
