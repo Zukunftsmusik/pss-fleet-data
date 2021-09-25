@@ -321,10 +321,10 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
 
 
 def get_collect_file_name(utc_now: datetime, chunk_count: int, chunk_no: int) -> str:
-    chunk_suffix = ''
+    chunk_prefix = ''
     if chunk_count and chunk_count > 1:
-        chunk_suffix = f'{chunk_no}of{chunk_count}'
-    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}-{chunk_suffix}{settings.FILE_NAME_COLLECT_SUFFIX}'
+        chunk_prefix = f'chunk{chunk_no}of{chunk_count}'
+    result = f'{chunk_prefix}_{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
     return result
 
 
