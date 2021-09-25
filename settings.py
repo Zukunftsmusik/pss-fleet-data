@@ -32,7 +32,7 @@ store_at_gdrive = False
 
 ACCESS_TOKEN: str = os.environ.get('PSS_ACCESS_TOKEN')
 
-GDRIVE_FOLDER_ID = str(os.environ.get('GDRIVE_FOLDER_ID'))
+GDRIVE_FOLDER_ID = '10wOZgAQk_0St2Y_jC3UW497LVpBNxWmP'
 
 
 # ---------- Constants ----------
