@@ -2,7 +2,9 @@ from datetime import datetime
 from itertools import repeat
 from multiprocessing.dummy import Pool as ThreadPool
 from os import access
+from urllib.error import HTTPError
 from typing import Dict, List, Union
+from xml.etree.ElementTree import ParseError as XmlParseError
 
 import gdrive
 import settings
@@ -26,40 +28,33 @@ def collect_data(start_timestamp: datetime) -> dict:
         retrieved_fleet_infos_after = util.get_elapsed_seconds(start_timestamp)
         util.vrbs(f'Retrieved {len(fleet_infos)} fleet infos after {retrieved_fleet_infos_after:0.2f} seconds.')
 
+    fleets_users_count = sum(int(fleet_info.get('NumberOfMembers', 0)) for fleet_info in fleet_infos.values())
+
     if settings.RETRIEVE_TOP_USERS:
-        while True:
-            try:
-                top_100_users_infos_raw = get_top_100_users_infos_raw(api_server, access_token)
-            except Exception as error:
-                util.err(f'Could not retrieve user infos. Exiting.', error)
-                return None
-            if 'Access token expired.' in top_100_users_infos_raw:
-                refresh_access_token(api_server)
-            else:
-                break
+        try:
+            top_100_users_infos_raw = get_top_100_users_infos_raw(api_server, access_token)
+        except Exception as error:
+            util.err(f'Could not retrieve user infos. Exiting.', error)
+            return None
 
         retrieved_top_100_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
 
     if settings.RETRIEVE_FLEET_USERS:
-        while True:
-            try:
-                user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server, access_token)
-                break
-            except util.AccessTokenExpiredError:
-                refresh_access_token(api_server)
-            except Exception as error:
-                util.err(f'Could not retrieve user infos. Exiting.', error)
-                return None
-        retrieved_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
+        try:
+            user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server, access_token)
+            retrieved_user_infos_raw_after = util.get_elapsed_seconds(start_timestamp)
+        except Exception as error:
+            util.err(f'Could not retrieve user infos.', error)
 
     if settings.RETRIEVE_TOP_USERS:
         top_100_users_infos = convert_user_data_raw([top_100_users_infos_raw])
         util.vrbs(f'Retrieved {len(top_100_users_infos)} top 100 user infos after {retrieved_top_100_user_infos_raw_after:0.2f} seconds.')
     else:
         top_100_users_infos = {}
+
     if settings.RETRIEVE_FLEET_USERS:
         fleets_users_infos = convert_user_data_raw(user_infos_raw)
-        util.vrbs(f'Retrieved {len(fleets_users_infos)} fleets user infos after {retrieved_user_infos_raw_after:0.2f} seconds.')
+        util.vrbs(f'Retrieved {len(fleets_users_infos)} of {fleets_users_count} fleets user infos after {retrieved_user_infos_raw_after:0.2f} seconds.')
     else:
         fleets_users_infos = {}
 
@@ -68,10 +63,10 @@ def collect_data(start_timestamp: datetime) -> dict:
 
     if settings.RETRIEVE_TOP_USERS:
         if settings.RETRIEVE_TOP_USERS_DETAILS:
-            for user_id, top_100_user_info in top_100_users_infos.items():
-                if user_id not in user_infos:
-                    top_100_user_info = get_user_info_from_id(user_id, api_server)
-                    user_infos[user_id] = top_100_user_info[user_id]
+            for user_id in top_100_users_infos.keys():
+                if user_id not in user_infos.keys():
+                    user_info = get_user_info_from_id(user_id, api_server, access_token)
+                    user_infos[user_id] = user_info
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
@@ -126,7 +121,11 @@ def get_fleet_users_path(alliance_id: str, access_token: str) -> str:
 
 def get_fleet_users_raw(alliance_id: str, api_server: str, access_token: str) -> str:
     path = get_fleet_users_path(alliance_id, access_token)
-    return util.get_data_from_path(path, api_server)
+    try:
+        result = util.get_data_from_path(path, api_server)
+    except HTTPError:
+        result = ''
+    return result
 
 
 def get_short_fleet_info(fleet_info: dict) -> List[Union[int, str]]:
@@ -155,7 +154,11 @@ def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str, access_token: 
 
 def get_top_100_users_infos_raw(api_server: str, access_token: str) -> str:
     path = f'LadderService/ListUsersByRanking?from=0&to=100&accessToken={access_token}'
-    return util.get_data_from_path(path, api_server)
+    try:
+        result = util.get_data_from_path(path, api_server)
+    except HTTPError:
+        result = ''
+    return result
 
 
 def retrieve_and_store_user_infos() -> None:
@@ -187,5 +190,8 @@ def retrieve_and_store_user_infos() -> None:
 
 def get_user_info_from_id(user_id: str, api_server: str, access_token: str) -> dict:
     path = f'ShipService/InspectShip2?accessToken={access_token}&userId={user_id}'
-    result = util.get_dict2_from_path(path, settings.USER_ID_KEY_NAME, api_server)
+    try:
+        result = util.get_dict2_from_path(path, settings.USER_ID_KEY_NAME, api_server)
+    except (HTTPError, XmlParseError) as err:
+        result = {}
     return result
