@@ -1,38 +1,20 @@
 from datetime import datetime
 from itertools import repeat
 from multiprocessing.dummy import Pool as ThreadPool
+from os import access
 from typing import Dict, List, Union
 
 import gdrive
-import pss_login as login
 import settings
 import utility as util
 
 
 __runs: int = 0
-__login_data: Dict[str, Union[dict, str]] = None
-
-
-def refresh_access_token(api_server: str) -> None:
-    global __login_data
-    device_key = settings.FLEET_DATA_DEVICE_KEYS[0] if len(settings.FLEET_DATA_DEVICE_KEYS) else None
-    login_data = login.login(device_key=device_key, api_server=api_server, login_data=__login_data)
-    __login_data = dict(login_data)
-    util.dbg(f'Created access token for device: {login_data["deviceKey"]}')
-    util.dbg(f'Current access token: {login_data["accessToken"]}')
 
 
 def collect_data(start_timestamp: datetime) -> dict:
-    """
-    Collects data and converts it.
-
-    Returns 3 lists:
-     - fleet names: (fleet_id, fleet_name)
-     - user_names: (user_id, user_name)
-     - data: (user_id, fleet_id, trophies, stars, rank, join_date, login_date)
-    """
-    api_server = util.get_api_server()
-    refresh_access_token(api_server)
+    api_server = util.get_production_server()
+    access_token = settings.ACCESS_TOKEN
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
     try:
@@ -47,7 +29,7 @@ def collect_data(start_timestamp: datetime) -> dict:
     if settings.RETRIEVE_TOP_USERS:
         while True:
             try:
-                top_100_users_infos_raw = get_top_100_users_infos_raw(api_server)
+                top_100_users_infos_raw = get_top_100_users_infos_raw(api_server, access_token)
             except Exception as error:
                 util.err(f'Could not retrieve user infos. Exiting.', error)
                 return None
@@ -61,7 +43,7 @@ def collect_data(start_timestamp: datetime) -> dict:
     if settings.RETRIEVE_FLEET_USERS:
         while True:
             try:
-                user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server)
+                user_infos_raw = get_fleets_user_infos_raw(fleet_infos, api_server, access_token)
                 break
             except util.AccessTokenExpiredError:
                 refresh_access_token(api_server)
@@ -137,13 +119,13 @@ def get_fleets(api_server: str) -> Dict[str, dict]:
     return util.get_dict3_from_path(settings.ALLIANCE_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME, api_server)
 
 
-def get_fleet_users_path(alliance_id: str) -> str:
-    result = f'AllianceService/ListUsers?skip=0&take=100&accessToken={__login_data["accessToken"]}&allianceId={alliance_id}'
+def get_fleet_users_path(alliance_id: str, access_token: str) -> str:
+    result = f'AllianceService/ListUsers?skip=0&take=100&accessToken={access_token}&allianceId={alliance_id}'
     return result
 
 
-def get_fleet_users_raw(alliance_id: str, api_server: str) -> str:
-    path = get_fleet_users_path(alliance_id)
+def get_fleet_users_raw(alliance_id: str, api_server: str, access_token: str) -> str:
+    path = get_fleet_users_path(alliance_id, access_token)
     return util.get_data_from_path(path, api_server)
 
 
@@ -161,26 +143,18 @@ def get_tournament_fleets(api_server: str) -> Dict[str, dict]:
     return util.get_dict3_from_path(settings.ALLIANCE_TOURNEY_INFO_PATH, settings.ALLIANCE_ID_KEY_NAME, api_server)
 
 
-def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str) -> List[str]:
-    args = zip(list(fleet_infos.keys()), repeat(api_server))
-    result = []
-    for i, arg in enumerate(args):
-        try:
-            fleet_users_infos_raw = get_fleet_users_raw(*arg)
-        except Exception as error:
-            util.err(f'Could not retrieve user infos after try {i}. Exiting.', error)
-            break
-        result.append(fleet_users_infos_raw)
-    """pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
+def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str, access_token: str) -> List[str]:
+    args = zip(list(fleet_infos.keys()), repeat(api_server), repeat(access_token))
+    pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
     result = pool.starmap(get_fleet_users_raw, args)
     pool.close()
     pool.join()
-    result = list(result)"""
+    result = list(result)
     return result
 
 
-def get_top_100_users_infos_raw(api_server: str) -> str:
-    path = f'LadderService/ListUsersByRanking?from=0&to=100&accessToken={__login_data["accessToken"]}'
+def get_top_100_users_infos_raw(api_server: str, access_token: str) -> str:
+    path = f'LadderService/ListUsersByRanking?from=0&to=100&accessToken={access_token}'
     return util.get_data_from_path(path, api_server)
 
 
@@ -211,7 +185,7 @@ def retrieve_and_store_user_infos() -> None:
                     raise error
 
 
-def get_user_info_from_id(user_id: str, api_server: str) -> dict:
-    path = f'ShipService/InspectShip2?accessToken={__login_data["accessToken"]}&userId={user_id}'
+def get_user_info_from_id(user_id: str, api_server: str, access_token: str) -> dict:
+    path = f'ShipService/InspectShip2?accessToken={access_token}&userId={user_id}'
     result = util.get_dict2_from_path(path, settings.USER_ID_KEY_NAME, api_server)
     return result

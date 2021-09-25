@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-import json
 import os
 
 import utility as util
@@ -31,8 +30,9 @@ store_at_gdrive = False
 
 # ---------- From env vars ----------
 
+ACCESS_TOKEN: str = os.environ.get('PSS_ACCESS_TOKEN')
+
 GDRIVE_FOLDER_ID = str(os.environ.get('GDRIVE_FOLDER_ID'))
-GPAT = 'bf9ef038-318f-4368-a295-c0de9c24cfd7'
 
 
 # ---------- Constants ----------
@@ -40,12 +40,9 @@ GPAT = 'bf9ef038-318f-4368-a295-c0de9c24cfd7'
 ALLIANCE_ID_KEY_NAME = 'AllianceId'
 ALLIANCE_INFO_PATH = 'AllianceService/ListAlliancesByRanking?skip=0&take=100'
 ALLIANCE_TOURNEY_INFO_PATH = 'AllianceService/ListAlliancesWithDivision'
-ALLIANCE_USERS_BASE_PATH = f'AllianceService/ListUsers?skip=0&take=100&accessToken={GPAT}&allianceId='
 
 API_BASE_URL = 'https://api.pixelstarships.com/'
 
-
-CHECKSUM_KEY = str(os.environ.get('PSS_DEVICE_LOGIN_CHECKSUM_KEY'))
 
 CLI_FALSE_VALUES = ['n', 'no', '0', 'f', 'false']
 CLI_TRUE_VALUES = ['y', 'yes', '1', 't', 'true']
@@ -65,9 +62,7 @@ CREATE_FOLDERS_ON_COLLECT = ['./tourney-data']
 
 
 DATA_MAPPING_FLEETS = 'fleets'
-DATA_MAPPING_FLEETS_FILTER = 'fleets_filter'
 DATA_MAPPING_USERS = 'users'
-DATA_MAPPING_USERS_FILTER = 'users_filter'
 
 DEFAULT_COLLECT_FOLDER = './tourney-data'
 
@@ -79,18 +74,12 @@ DEFAULT_TIMEZONE = timezone.utc
 
 FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
-FILE_NAME_FLEET_NAMES = 'fleet-names.json'
-FILE_NAME_PROCESS_PREFIX = 'pss-fleet-data_'
-FILE_NAME_PROCESS_SUFFIX = '.xlsx'
-FILE_NAME_USER_NAMES = 'user-names.json'
-
-"""List of device keys. If the list is empty, a random device key will be generated upon first login. Only 5 devices keys can be generated per day and IP."""
-FLEET_DATA_DEVICE_KEYS = json.loads(os.environ.get('FLEET_DATA_DEVICE_KEYS', '[]'))
 
 
-OBTAIN_USERS_THREAD_COUNT = 1
+OBTAIN_USERS_THREAD_COUNT = 10
 
 
+PRODUCTION_SERVER: str = os.environ.get('PSS_PRODUCTION_SERVER')
 PSS_START_DATE = datetime(year=2016, month=1, day=6)
 
 

@@ -170,18 +170,18 @@ def parse_pss_timestamp(timestamp: str) -> datetime:
 
 # ---------- Data Retrieval ----------
 
-def get_api_server() -> str:
+def get_production_server() -> str:
+    if settings.PRODUCTION_SERVER:
+        return f'https://{settings.PRODUCTION_SERVER}/'
+
     url = f'{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}'
     data = get_data_from_url(url)
     d = xmltree_to_dict2(data, 'SettingId')
     for latest_settings in d.values():
-        result = latest_settings.get('ProductionServer')
-        break
-    if result:
-        result = f'https://{result}/'
-    else:
-        result = settings.API_BASE_URL
-    return result
+        production_server = latest_settings.get('ProductionServer')
+        if production_server:
+            return f'https://{production_server}/'
+    return f'https://{settings.API_BASE_URL}/'
 
 
 def get_data_from_url(url: str) -> str:
@@ -191,7 +191,7 @@ def get_data_from_url(url: str) -> str:
 
 def get_data_from_path(path: str, api_server: str = None) -> str:
     if not api_server:
-        api_server = get_api_server()
+        api_server = get_production_server()
     if path:
         path = path.strip('/')
     url = f'{api_server}{path}'
