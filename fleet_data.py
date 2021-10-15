@@ -115,7 +115,7 @@ def get_fleets(api_server: str) -> Dict[str, dict]:
 
 
 def get_fleet_users_path(alliance_id: str, access_token: str) -> str:
-    result = f'AllianceService/ListUsers?skip=0&take=100&accessToken={access_token}&allianceId={alliance_id}'
+    result = f'AllianceService/ListUsers2?skip=0&take=100&accessToken={access_token}&allianceId={alliance_id}'
     return result
 
 
