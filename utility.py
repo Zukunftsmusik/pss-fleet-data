@@ -9,6 +9,20 @@ import gdrive
 import settings
 
 
+# ---------- Constants ----------
+
+__BYTE_COUNT: List[str] = [
+    'B',
+    'KiB',
+    'MiB',
+    'GiB',
+    'TiB'
+]
+
+
+
+
+
 # ---------- Classes ----------
 
 class AccessTokenExpiredError(Exception):
@@ -53,6 +67,34 @@ def post_wait_message(sleep_for_seconds: float, timestamp: Tuple[int, int, int])
     prnt(f'Waiting for {duration} until {timestamp[0]:02d}:{timestamp[1]:02d}:{timestamp[2]:02d} UTC.')
 
 
+def print_dict(d, level: int = 0) -> None:
+    for key, value in d.items():
+        indention = '  ' * level
+        if isinstance(value, dict):
+            print(f'{indention}{key}: {{')
+            print_dict(value, level + 1)
+            print(f'{indention}}}')
+        elif isinstance(value, list):
+            print(f'{indention}{key}: [')
+            print_list(value, level + 1)
+            print(f'{indention}]')
+        else:
+            print(f'{indention}{key}: {value},')
+
+
+def print_list(l, level: int = 0) -> None:
+    for value in l:
+        indention = '  ' * level
+        if isinstance(value, dict):
+            print_dict(value, level + 1)
+        elif isinstance(value, list):
+            print(f'{indention}[')
+            print_list(value, level + 1)
+            print(f'{indention}]')
+        else:
+            print(f'{indention}{value},')
+
+
 def prnt(msg: str) -> None:
     if settings.SETTINGS['print_timestamps']:
         utc_now = get_utc_now()
@@ -92,6 +134,18 @@ def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple, t
 def convert_file_timestamp_to_output(timestamp: str) -> str:
     dt = parse_file_timestamp(timestamp)
     result = dt.strftime(settings.TIMESTAMP_FORMAT_OUTPUT)
+    return result
+
+
+def convert_to_bytes_count(bytes: int) -> str:
+    exponent = 0
+    while bytes > 1024.0:
+        bytes /= 1024
+        exponent += 1
+    if exponent:
+        result = f'{bytes:.2f} {__BYTE_COUNT[exponent]}'
+    else:
+        result = f'{bytes:d} {__BYTE_COUNT[exponent]}'
     return result
 
 
@@ -306,10 +360,8 @@ def get_current_tourney_start(utc_now: datetime = None) -> datetime:
 
 
 def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) -> bool:
-    if start_date is None:
-        start_date = get_current_tourney_start()
-    if utc_now is None:
-        utc_now = get_utc_now()
+    utc_now = utc_now or get_utc_now()
+    start_date = start_date or get_current_tourney_start(utc_now)
 
     return start_date < utc_now
 

@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Dict
 import pydrive.auth
 import pydrive.drive
 import pydrive.files
@@ -61,6 +62,23 @@ def create_service_account_settings_yaml():
     util.vrbs(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
+def delete_file(file) -> None:
+    __assert_initialized()
+    __drive.CreateFile({'id': file['id']}).Delete()
+
+
+def get_about() -> Dict:
+    __assert_initialized()
+    result = __drive.GetAbout()
+    return result
+
+
+def get_files_in_folder(folder_id: str, file_prefix: str):
+    __assert_initialized()
+    file_list = __drive.ListFile({'q': f'\'{folder_id}\' in parents and title contains \'{file_prefix}\''}).GetList()
+    return file_list
+
+
 def get_first_file(folder_id: str, file_name: str) -> pydrive.files.GoogleDriveFile:
     # {'q': "'folder_id' in parents and trashed=false and name='file_name'"}
     __assert_initialized()
@@ -75,6 +93,12 @@ def list_files_in_root():
     file_list = __drive.ListFile({'q': "'root' in parents"}).GetList()
     for file_def in file_list:
         print(f'title: {file_def["title"]}, id: {file_def["id"]}')
+
+
+def get_trashed_files():
+    __assert_initialized()
+    files = __drive.ListFile({'q': "trashed = true"}).GetList()
+    return files
 
 
 def update_file(data_new: list, file_name: str) -> None:
@@ -112,7 +136,7 @@ def upload_file(data: list, file_name: str) -> None:
 
 def init(force: bool = False):
     global __drive, __initialized
-    if (force or not __initialized) and settings.SETTINGS['store_at_gdrive']:
+    if force or not __initialized:
         create_service_account_credential_json()
         create_service_account_settings_yaml()
         gauth = pydrive.auth.GoogleAuth()
