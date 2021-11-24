@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
-
 import getopt
 import os
 import sys
 import time
 
+import clean
 import fleet_data
 import gdrive
 import settings
@@ -25,6 +23,8 @@ def main(run_once: bool = None):
             if obtain_data:
                 latest_timestamp = next_timestamp
                 fleet_data.retrieve_and_store_user_infos()
+                if utc_now.month != (utc_now + util.ONE_HOUR).month:
+                    clean.clean_up_gdrive(utc_now)
             else:
                 utc_now = util.get_utc_now()
                 next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
@@ -34,6 +34,9 @@ def main(run_once: bool = None):
                     sleep_for_seconds = 0
                 util.post_wait_message(sleep_for_seconds, next_timestamp)
                 time.sleep(sleep_for_seconds)
+
+
+
 
 
 def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None) -> dict:

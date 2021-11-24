@@ -76,6 +76,11 @@ FILE_NAME_COLLECT_PREFIX = 'pss-top-100_'
 FILE_NAME_COLLECT_SUFFIX = '.json'
 
 
+KEEP_FULL_TOURNEY_DATA_FOR_MONTHS: int = 3
+KEEP_FULL_NON_TOURNEY_DATA_FOR_MONTHS: int = 1
+DELETE_FULL_DATA_AFTER_MONTHS: int = 3
+
+
 OBTAIN_USERS_THREAD_COUNT = 10
 
 
@@ -128,6 +133,7 @@ SHORT_USER_INFO_FIELDS = {
 	'PVPDefenceLosses': int,
 	'PVPDefenceDraws': int,
     'ChampionshipScore': int,
+    'HighestTrophy': int
 }
 
 

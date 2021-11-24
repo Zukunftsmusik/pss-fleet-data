@@ -19,6 +19,9 @@ __BYTE_COUNT: List[str] = [
     'TiB'
 ]
 
+ONE_DAY: timedelta = timedelta(days=1)
+ONE_HOUR: timedelta = timedelta(hours=1)
+
 
 
 
@@ -363,7 +366,7 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
     utc_now = utc_now or get_utc_now()
     start_date = start_date or get_current_tourney_start(utc_now)
 
-    return start_date < utc_now
+    return start_date <= utc_now
 
 
 

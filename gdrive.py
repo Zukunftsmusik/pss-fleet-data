@@ -62,9 +62,15 @@ def create_service_account_settings_yaml():
     util.vrbs(f'Created settings yaml file at: {SETTINGS_FILE}')
 
 
-def delete_file(file) -> None:
+def try_delete_file(file) -> bool:
     __assert_initialized()
-    __drive.CreateFile({'id': file['id']}).Delete()
+    try:
+        #__drive.CreateFile({'id': file['id']}).Delete()
+        file.Delete()
+    except Exception as e:
+        util.prnt(e)
+        return False
+    return True
 
 
 def get_about() -> Dict:
