@@ -79,7 +79,7 @@ _Unchanged_
 #### Type
 list of tuples
 #### Contents
-Tuples with 5 values
+Tuples with 6 values
 | index | fleet property key | data type | explanation |
 | --- | --- | --- | --- |
 | 0 | AllianceId | int | Fleet ID |
