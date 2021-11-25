@@ -6,6 +6,41 @@ Collects data on top 100 / tournament fleets and their members hourly and stores
 
 Since October 2019, the fleet data consists of individual json files for each run, representing a dictionary containing multiple objects.
 
+## Schema version 8
+
+This schema is in use since November 2021. It adds the `HighestTrophy` to the users data.
+
+### **meta data** object
+_Unchanged_
+
+### **fleets** object
+
+_Unchanged_
+
+### **users** object
+Tuples with 19 values
+| index | fleet property key | explanation | introduced with |
+| --- | --- | --- | --- |
+| 0 | Id | int | User ID |  |
+| 1 | Name | str | User name |
+| 2 | AllianceId | int | User's fleet ID |  |
+| 3 | Trophy | int | User's trophy count |  |
+| 4 | AllianceScore | int | User's star count |  |
+| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
+| 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
+| 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
+| 9 | CrewDonated | int | Number of crews donated to the fleet by the user |
+| 10 | CrewReceived | int | Number of crew borrowd from the fleet by the user |
+| 11 | PVPAttackWins | int | PvP attack wins |
+| 12 | PVPAttackLosses | int | PvP attack losses |
+| 13 | PVPAttackDraws | int | PvP attack draws |
+| 14 | PVPDefenceWins | int | PvP defense wins |
+| 15 | PVPDefenceLosses | int | PvP defense losses |
+| 16 | PVPDefenceDraws | int | PvP defense draws |
+| 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
+| 18 | HighestTrophy | int | Highest trophy count a user has ever reached |
+
 ## Schema version 7
 
 This schema is in use since September 2021. It adds the `NumberOfMembers` & `NumberOfApprovedMembers` to the fleets data.
@@ -44,7 +79,7 @@ _Unchanged_
 #### Type
 list of tuples
 #### Contents
-Tuples with 5 values (all of type string)
+Tuples with 5 values
 | index | fleet property key | data type | explanation |
 | --- | --- | --- | --- |
 | 0 | AllianceId | int | Fleet ID |
@@ -58,7 +93,7 @@ Tuples with 5 values (all of type string)
 #### Type
 list of tuples
 #### Contents
-Tuples with 16 values (all of type string)
+Tuples with 18 values
 | index | fleet property key | explanation | introduced with |
 | --- | --- | --- | --- |
 | 0 | Id | int | User ID |  |
