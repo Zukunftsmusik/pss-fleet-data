@@ -82,7 +82,7 @@ def collect_data(start_timestamp: datetime) -> dict:
         'fleet_count': len(fleets),
         'user_count': len(users),
         'tourney_running': is_tourney_running,
-        'schema_version': 7
+        'schema_version': 8
     }
 
     result = {
