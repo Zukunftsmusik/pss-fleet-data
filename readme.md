@@ -41,6 +41,8 @@ Tuples with 19 values
 | 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
 | 18 | HighestTrophy | int | Highest trophy count a user has ever reached |
 
+\* = The ranks are encoded. See schema version 4.
+
 ## Schema version 7
 
 This schema is in use since September 2021. It adds the `NumberOfMembers` & `NumberOfApprovedMembers` to the fleets data.
@@ -114,6 +116,8 @@ Tuples with 18 values
 | 15 | PVPDefenceLosses | int | PvP defense losses |
 | 16 | PVPDefenceDraws | int | PvP defense draws |
 | 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
+
+\* = The ranks are encoded. See schema version 4.
 
 ## Schema version 5
 
