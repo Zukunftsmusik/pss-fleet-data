@@ -133,7 +133,8 @@ SHORT_USER_INFO_FIELDS = {
 	'PVPDefenceLosses': int,
 	'PVPDefenceDraws': int,
     'ChampionshipScore': int,
-    'HighestTrophy': int
+    'HighestTrophy': int,
+    'TournamentBonusScore': int,
 }
 
 

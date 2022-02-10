@@ -15,7 +15,8 @@ __runs: int = 0
 
 
 def collect_data(start_timestamp: datetime) -> dict:
-    api_server = util.get_production_server()
+    latest_settings = util.get_latest_settings()
+    api_server = util.get_production_server(latest_settings)
     access_token = settings.ACCESS_TOKEN
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
@@ -82,13 +83,14 @@ def collect_data(start_timestamp: datetime) -> dict:
         'fleet_count': len(fleets),
         'user_count': len(users),
         'tourney_running': is_tourney_running,
-        'schema_version': 8
+        'max_tournament_battle_attempts': latest_settings.get('TournamentBonusScore'),
+        'schema_version': 9,
     }
 
     result = {
         'meta': meta_data,
         'fleets': fleets,
-        'users': users
+        'users': users,
     }
 
     return result
