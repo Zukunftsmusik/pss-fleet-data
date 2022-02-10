@@ -6,6 +6,55 @@ Collects data on top 100 / tournament fleets and their members hourly and stores
 
 Since October 2019, the fleet data consists of individual json files for each run, representing a dictionary containing multiple objects.
 
+## Schema version 9
+
+This schema is in use since November 2021. It adds the `HighestTrophy` to the users data.
+
+### **meta data** object
+#### Type
+dictionary
+#### Keys
+| key | data type | explanation |
+| --- | --- | --- |
+| timestamp | timestamp | The point in time, when the run started |
+| duration | float | Duration of the collection run in seconds |
+| fleet_count | int | Number of fleets documented in this run |
+| user_count | int | Number of users documented in this run |
+| tourney_running | bool | Indicates, whether tournament finals were running, when this run started |
+| max_tournament_battle_attempts | int | The maximum number of tournament battles in a day |
+| schema_version | int | The schema version used in this file |
+
+### **fleets** object
+
+_Unchanged_
+
+### **users** object
+Tuples with 20 values
+| index | fleet property key | explanation | introduced with |
+| --- | --- | --- | --- |
+| 0 | Id | int | User ID |  |
+| 1 | Name | str | User name |
+| 2 | AllianceId | int | User's fleet ID |  |
+| 3 | Trophy | int | User's trophy count |  |
+| 4 | AllianceScore | int | User's star count |  |
+| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
+| 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
+| 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
+| 9 | CrewDonated | int | Number of crews donated to the fleet by the user |
+| 10 | CrewReceived | int | Number of crew borrowd from the fleet by the user |
+| 11 | PVPAttackWins | int | PvP attack wins |
+| 12 | PVPAttackLosses | int | PvP attack losses |
+| 13 | PVPAttackDraws | int | PvP attack draws |
+| 14 | PVPDefenceWins | int | PvP defense wins |
+| 15 | PVPDefenceLosses | int | PvP defense losses |
+| 16 | PVPDefenceDraws | int | PvP defense draws |
+| 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
+| 18 | HighestTrophy | int | Highest trophy count a user has ever reached |
+| 19 | TournamentBonusScore | int | The number of tournament battles done on this day (caution: this value only resets to 0, if the user logs in on the next day) |
+
+\* = The ranks are encoded. See schema version 4.
+
 ## Schema version 8
 
 This schema is in use since November 2021. It adds the `HighestTrophy` to the users data.
