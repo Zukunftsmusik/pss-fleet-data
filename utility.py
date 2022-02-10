@@ -227,18 +227,13 @@ def parse_pss_timestamp(timestamp: str) -> datetime:
 
 # ---------- Data Retrieval ----------
 
-def get_production_server() -> str:
+def get_production_server(latest_settings: dict = None) -> str:
     if settings.PRODUCTION_SERVER:
         return f'https://{settings.PRODUCTION_SERVER}/'
 
-    url = f'{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}'
-    data = get_data_from_url(url)
-    d = xmltree_to_dict2(data, 'SettingId')
-    for latest_settings in d.values():
-        production_server = latest_settings.get('ProductionServer')
-        if production_server:
-            return f'https://{production_server}/'
-    return f'https://{settings.API_BASE_URL}/'
+    latest_settings = latest_settings or get_latest_settings()
+    production_server = latest_settings.get('ProductionServer') or settings.API_BASE_URL
+    return f'https://{production_server}/'
 
 
 def get_data_from_url(url: str) -> str:
@@ -273,6 +268,16 @@ def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
     duration: timedelta = end - start
     result = float(duration.seconds) + float(duration.microseconds) / 1000000
     return result
+
+
+def get_latest_settings() -> dict:
+    url = f'{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}'
+    data = get_data_from_url(url)
+    d = xmltree_to_dict2(data, 'SettingId')
+    for latest_settings in d.values():
+        if 'ProductionServer' in latest_settings:
+            return latest_settings
+    return {}
 
 
 def xmltree_to_dict2(raw_text: str, key_name: str) -> Dict[str, dict]:
