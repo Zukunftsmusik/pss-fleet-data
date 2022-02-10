@@ -8,7 +8,7 @@ Since October 2019, the fleet data consists of individual json files for each ru
 
 ## Schema version 9
 
-This schema is in use since November 2021. It adds the `HighestTrophy` to the users data.
+This schema is in use since February 2022. It adds `max_tournament_battle_attempts` to the meta data and the `TournamentBonus` to the users data.
 
 ### **meta data** object
 #### Type
