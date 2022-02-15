@@ -8,7 +8,7 @@ Since October 2019, the fleet data consists of individual json files for each ru
 
 ## Schema version 9
 
-This schema is in use since February 2022. It adds `max_tournament_battle_attempts` to the meta data and the `TournamentBonus` to the users data.
+This schema is in use since February 2022. It adds `max_tournament_battle_attempts` to the meta data and the `TournamentBonusScore` to the users data.
 
 ### **meta data** object
 #### Type
@@ -37,7 +37,7 @@ Tuples with 20 values
 | 2 | AllianceId | int | User's fleet ID |  |
 | 3 | Trophy | int | User's trophy count |  |
 | 4 | AllianceScore | int | User's star count |  |
-| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 5 | AllianceMembership | int | User's rank in the fleet <sup>1</sup> |  |
 | 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
 | 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
 | 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
@@ -51,9 +51,11 @@ Tuples with 20 values
 | 16 | PVPDefenceDraws | int | PvP defense draws |
 | 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
 | 18 | HighestTrophy | int | Highest trophy count a user has ever reached |
-| 19 | TournamentBonusScore | int | The number of tournament battles done on this day (caution: this value only resets to 0, if the user logs in on the next day) |
+| 19 | TournamentBonusScore | int | The number of tournament battles done on this day <sup>2</sup> |
 
-\* = The ranks are encoded. See schema version 4.
+<sup>1</sup> = The ranks are encoded. See schema version 4.
+
+<sup>2</sup> = The `TournamentBonusScore` value only resets to 0, if the user logs in on the next day. So in order to determine the correct value, you need to consider the `LastLoginDate` as well.
 
 ## Schema version 8
 
@@ -75,7 +77,7 @@ Tuples with 19 values
 | 2 | AllianceId | int | User's fleet ID |  |
 | 3 | Trophy | int | User's trophy count |  |
 | 4 | AllianceScore | int | User's star count |  |
-| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 5 | AllianceMembership | int | User's rank in the fleet <sup>1</sup> |  |
 | 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
 | 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
 | 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
@@ -90,7 +92,7 @@ Tuples with 19 values
 | 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
 | 18 | HighestTrophy | int | Highest trophy count a user has ever reached |
 
-\* = The ranks are encoded. See schema version 4.
+<sup>1</sup> = The ranks are encoded. See schema version 4.
 
 ## Schema version 7
 
@@ -152,7 +154,7 @@ Tuples with 18 values
 | 2 | AllianceId | int | User's fleet ID |  |
 | 3 | Trophy | int | User's trophy count |  |
 | 4 | AllianceScore | int | User's star count |  |
-| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 5 | AllianceMembership | int | User's rank in the fleet <sup>1</sup> |  |
 | 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
 | 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
 | 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
@@ -166,7 +168,7 @@ Tuples with 18 values
 | 16 | PVPDefenceDraws | int | PvP defense draws |
 | 17 | ChampionsipScore | int | Tournament score determining the yearly rankings |
 
-\* = The ranks are encoded. See schema version 4.
+<sup>1</sup> = The ranks are encoded. See schema version 4.
 
 ## Schema version 5
 
@@ -223,7 +225,7 @@ Tuples with 16 values (all of type string)
 | 2 | AllianceId | int | User's fleet ID |  |
 | 3 | Trophy | int | User's trophy count |  |
 | 4 | AllianceScore | int | User's star count |  |
-| 5 | AllianceMembership | int | User's rank in the fleet\* |  |
+| 5 | AllianceMembership | int | User's rank in the fleet <sup>1</sup> |  |
 | 6 | AllianceJoinDate | timestamp | Timestamp of user joining the fleet |  |
 | 7 | LastLoginDate | timestamp | Timestamp of user's last login |  |
 | 8 | LastHeartBeatDate | timestamp | Timestamp of the user's last heartbeat sent to Savy servers |
@@ -240,7 +242,7 @@ Tuples with 16 values (all of type string)
 
 The timestamps `AllianceJoinDate`, `LastLoginDate` & `LastHeartBeatDate` are bugged with this schema. They don't contain the correct values.
 
-\* = The ranks are encoded:
+<sup>1</sup> = The ranks are encoded:
 | rank | code |
 | --- | --- |
 | None | -1 |
