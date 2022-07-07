@@ -73,7 +73,8 @@ def collect_data(start_timestamp: datetime) -> dict:
             for user_id in top_100_users_infos.keys():
                 if user_id not in user_infos.keys():
                     user_info = get_user_info_from_id(user_id, api_server, access_token)
-                    user_infos[user_id] = user_info
+                    if user_info:
+                        user_infos[user_id] = user_info
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
@@ -142,7 +143,7 @@ def get_short_fleet_info(fleet_info: dict) -> List[Union[int, str]]:
 
 
 def get_short_user_info(user_info: dict) -> List[Union[int, str]]:
-    result = [transform_function(user_info[source_prop]) for source_prop, transform_function in settings.SHORT_USER_INFO_FIELDS.items() if source_prop in user_info]
+    result = [transform_function(user_info.get(source_prop, '')) for source_prop, transform_function in settings.SHORT_USER_INFO_FIELDS.items()]
     return result
 
 
