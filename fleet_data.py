@@ -20,6 +20,10 @@ def collect_data(start_timestamp: datetime) -> dict:
     access_token = settings.ACCESS_TOKEN
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
+
+    user = get_user_info_from_id('4510693', api_server, access_token)
+    user = get_user_info_from_id('9433174', api_server, access_token)
+
     try:
         fleet_infos = get_fleet_infos(is_tourney_running, api_server)
     except Exception as error:
@@ -60,7 +64,9 @@ def collect_data(start_timestamp: datetime) -> dict:
         fleets_users_infos = {}
 
     util.prnt(f'Processing raw data...')
-    user_infos = fleets_users_infos
+    user_infos = dict(fleets_users_infos)
+
+    user_info = fleets_users_infos['9433174']
 
     if settings.RETRIEVE_TOP_USERS:
         if settings.RETRIEVE_TOP_USERS_DETAILS:
@@ -136,7 +142,7 @@ def get_short_fleet_info(fleet_info: dict) -> List[Union[int, str]]:
 
 
 def get_short_user_info(user_info: dict) -> List[Union[int, str]]:
-    result = [transform_function(user_info[source_prop]) for source_prop, transform_function in settings.SHORT_USER_INFO_FIELDS.items()]
+    result = [transform_function(user_info[source_prop]) for source_prop, transform_function in settings.SHORT_USER_INFO_FIELDS.items() if source_prop in user_info]
     return result
 
 
