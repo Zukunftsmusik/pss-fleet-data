@@ -21,9 +21,6 @@ def collect_data(start_timestamp: datetime) -> dict:
 
     is_tourney_running = util.is_tourney_running(utc_now=start_timestamp)
 
-    user = get_user_info_from_id('4510693', api_server, access_token)
-    user = get_user_info_from_id('9433174', api_server, access_token)
-
     try:
         fleet_infos = get_fleet_infos(is_tourney_running, api_server)
     except Exception as error:
@@ -66,19 +63,16 @@ def collect_data(start_timestamp: datetime) -> dict:
     util.prnt(f'Processing raw data...')
     user_infos = dict(fleets_users_infos)
 
-    user_info = fleets_users_infos['9433174']
-
     if settings.RETRIEVE_TOP_USERS:
         if settings.RETRIEVE_TOP_USERS_DETAILS:
             for user_id in top_100_users_infos.keys():
                 if user_id not in user_infos.keys():
                     user_info = get_user_info_from_id(user_id, api_server, access_token)
-                    if user_info:
-                        user_infos[user_id] = user_info
+                    user_infos[user_id].update(user_info)
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
-                    user_infos[user_id] = top_100_user_info
+                    user_infos[user_id].update(top_100_user_info)
 
     fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
     users = [get_short_user_info(user_info) for user_info in user_infos.values()]
