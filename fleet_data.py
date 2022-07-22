@@ -68,11 +68,11 @@ def collect_data(start_timestamp: datetime) -> dict:
             for user_id in top_100_users_infos.keys():
                 if user_id not in user_infos.keys():
                     user_info = get_user_info_from_id(user_id, api_server, access_token)
-                    user_infos[user_id].update(user_info)
+                    user_infos.setdefault(user_id, {}).update(user_info)
         else:
             for user_id, top_100_user_info in top_100_users_infos.items():
                 if user_id not in user_infos:
-                    user_infos[user_id].update(top_100_user_info)
+                    user_infos.setdefault(user_id, {}).update(top_100_user_info)
 
     fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
     users = [get_short_user_info(user_info) for user_info in user_infos.values()]
