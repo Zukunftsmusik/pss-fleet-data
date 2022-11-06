@@ -101,6 +101,7 @@ RANKS_LOOKUP = {
 RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 1)))
 RETRIEVE_TOP_USERS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS', 0)))
 RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS_DETAILS', 0)))
+RUN_ONCE: bool = bool(int(os.environ.get('RUN_ONCE', 0)))
 
 
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='

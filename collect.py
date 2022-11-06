@@ -12,6 +12,7 @@ import utility as util
 
 def main(run_once: bool = None):
     latest_timestamp = None
+    run_once = run_once or settings.RUN_ONCE
 
     if run_once:
         fleet_data.retrieve_and_store_user_infos()
