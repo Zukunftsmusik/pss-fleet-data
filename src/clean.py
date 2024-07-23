@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 import manage_drive as manage
 import settings
+import utility as util
 
 
 def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tourney_data: bool = False) -> None:
@@ -21,9 +22,4 @@ def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tour
 
 
 if __name__ == "__main__":
-    pass
-    # clean_up_gdrive(
-    #     datetime(2021, 10, 31, tzinfo=settings.DEFAULT_TIMEZONE),
-    #     datetime(2019, 10, 9, tzinfo=settings.DEFAULT_TIMEZONE),
-    #     delete_tourney_data=True,
-    # )
+    util.init_logging(settings.IS_DEBUG)

@@ -44,8 +44,8 @@ def init(
     no_time: bool = None,
     clean_gdrive: bool = None,
 ) -> dict:
-    PWD = os.getcwd()
-    sys.path.insert(0, f"{PWD}/")
+    # PWD = os.getcwd()
+    # sys.path.insert(0, f"{PWD}/")
 
     if verbose is not None:
         settings.SETTINGS["print_verbose"] = verbose
@@ -97,6 +97,8 @@ def print_help():
 
 
 if __name__ == "__main__":  # noqa: C901
+    util.init_logging(settings.IS_DEBUG)
+
     cli_args = sys.argv[1:]
     no_time = False
     run_once = False
@@ -106,7 +108,7 @@ if __name__ == "__main__":  # noqa: C901
     clean_gdrive = False
 
     try:
-        opts, args = getopt.getopt(cli_args, "hvfg", ["once", "notime"])
+        opts, args = getopt.getopt(cli_args, "hvfg", ["once", "notime", "clean"])
     except getopt.GetoptError:
         print_help()
         sys.exit(1)

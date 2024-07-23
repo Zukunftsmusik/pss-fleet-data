@@ -96,12 +96,5 @@ def print_quota():
 
 
 if __name__ == "__main__":
-    # from_year=2021
-    # from_month=2
-    # from_day=1
-    # to_year=2021
-    # to_month=6
-    # to_day=30
-    # delete_all_files_but_latest_daily(from_year=from_year, from_month=from_month, from_day=from_day, to_year=to_year, to_month=to_month, to_day=to_day)
-
+    util.init_logging(settings.IS_DEBUG)
     print_quota()

@@ -1,5 +1,7 @@
 import json
+import logging
 import os
+import time
 import urllib.request
 import xml.etree.ElementTree
 from datetime import datetime, timedelta, timezone
@@ -28,16 +30,15 @@ class AccessTokenExpiredError(Exception):
 
 
 def dbg(msg: str) -> None:
-    if settings.IS_DEBUG:
-        prnt(msg)
+    logging.debug(msg)
 
 
-def err(msg: str, error: Exception = None) -> None:
-    if error is None:
+def err(msg: str, exc: Exception = None) -> None:
+    if exc is None:
         msg = f"ERROR  {msg}"
     else:
-        msg = f"ERROR  {msg}\n{error}"
-    prnt(msg)
+        msg = f"ERROR  {msg}\n{exc}"
+    logging.error(msg)
 
 
 def post_wait_message(sleep_for_seconds: float, timestamp: Tuple[int, int, int]) -> None:
@@ -89,16 +90,12 @@ def print_list(lst: list, level: int = 0) -> None:
 
 
 def prnt(msg: str) -> None:
-    if settings.SETTINGS["print_timestamps"]:
-        utc_now = get_utc_now()
-        print(f"[{utc_now}] {msg}")
-    else:
-        print(msg)
+    logging.info(msg)
 
 
 def vrbs(msg: str) -> None:
     if settings.SETTINGS["print_verbose"]:
-        prnt(msg)
+        logging.info(msg)
 
 
 # ---------- Datetime and time ----------
@@ -388,6 +385,16 @@ def get_next_matching_timestamp(utc_now: datetime, obtain_at_timestamps: List[Tu
 def get_rank_number(rank: str) -> int:
     result = settings.RANKS_LOOKUP[rank]
     return result
+
+
+def init_logging(debug: bool = None):
+    logging_level = logging.INFO
+
+    if debug:
+        logging_level = logging.DEBUG
+
+    logging.basicConfig(level=logging_level, format="%(asctime)s  %(levelname)-8.8s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    logging.Formatter.converter = time.gmtime
 
 
 def remove_duplicates(_from: List[Any]) -> List[Any]:

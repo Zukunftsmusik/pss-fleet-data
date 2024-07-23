@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import utility as util
 
 
-IS_DEBUG = True
+IS_DEBUG = bool(int(os.getenv("DEBUG_MODE", 0)))
 
 
 # ---------- Settings dict ----------
