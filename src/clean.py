@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 from dateutil.relativedelta import relativedelta
 
 import manage_drive as manage
@@ -13,15 +14,15 @@ def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tour
         to_year=remove_to.year,
         to_month=remove_to.month,
         to_day=remove_to.day,
-        delete_tourney_data=delete_tourney_data
+        delete_tourney_data=delete_tourney_data,
     )
 
     manage.print_quota()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     clean_up_gdrive(
         datetime(2021, 10, 31, tzinfo=settings.DEFAULT_TIMEZONE),
         datetime(2019, 10, 9, tzinfo=settings.DEFAULT_TIMEZONE),
-        delete_tourney_data=True
+        delete_tourney_data=True,
     )

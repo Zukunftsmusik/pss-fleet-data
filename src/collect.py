@@ -37,32 +37,36 @@ def main(run_once: bool = None):
                 time.sleep(sleep_for_seconds)
 
 
-def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None) -> dict:
+def init(
+    store_at_filesystem: bool = None,
+    store_at_gdrive: bool = None,
+    verbose: bool = None,
+    no_time: bool = None,
+) -> dict:
     PWD = os.getcwd()
-    sys.path.insert(0, f'{PWD}/')
-
+    sys.path.insert(0, f"{PWD}/")
 
     if verbose is not None:
-        settings.SETTINGS['print_verbose'] = verbose
+        settings.SETTINGS["print_verbose"] = verbose
 
     if no_time is None:
         util.vrbs(f'Print timestamps: {settings.SETTINGS["print_timestamps"]}')
     else:
         print_timestamps = not no_time
-        settings.SETTINGS['print_timestamps'] = print_timestamps
-        util.vrbs(f'Print timestamps: {print_timestamps}')
+        settings.SETTINGS["print_timestamps"] = print_timestamps
+        util.vrbs(f"Print timestamps: {print_timestamps}")
 
     if store_at_filesystem is None:
         util.vrbs(f'Store at filesystem: {settings.SETTINGS["store_at_fileystem"]}')
     else:
-        settings.SETTINGS['store_at_filesystem'] = store_at_filesystem
-        util.vrbs(f'Store at filesystem: {store_at_filesystem}')
+        settings.SETTINGS["store_at_filesystem"] = store_at_filesystem
+        util.vrbs(f"Store at filesystem: {store_at_filesystem}")
 
     if store_at_gdrive is None:
         util.vrbs(f'Store at google drive: {settings.SETTINGS["store_at_gdrive"]}')
     else:
-        settings.SETTINGS['store_at_gdrive'] = store_at_gdrive
-        util.vrbs(f'Store at google drive: {store_at_gdrive}')
+        settings.SETTINGS["store_at_gdrive"] = store_at_gdrive
+        util.vrbs(f"Store at google drive: {store_at_gdrive}")
         if store_at_gdrive:
             gdrive.init()
 
@@ -74,14 +78,14 @@ def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose
 def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
     bool_values.extend(settings.CLI_TRUE_VALUES)
-    print(f'Usage: collect.py [-fghv] [--once] [--notime]\n')
-    print(f'-f:       Store at file system')
-    print(f'-g:       Store at google drive')
-    print(f'-h:       Print this help')
-    print(f'--notime: Suppress timestamps on cli output')
-    print(f'--once:   Run only once')
-    print(f'-v:       Verbose mode')
-    print(f'\n')
+    print("Usage: collect.py [-fghv] [--once] [--notime]\n")
+    print("-f:       Store at file system")
+    print("-g:       Store at google drive")
+    print("-h:       Print this help")
+    print("--notime: Suppress timestamps on cli output")
+    print("--once:   Run only once")
+    print("-v:       Verbose mode")
+    print("\n")
     sys.exit()
 
 
@@ -95,7 +99,7 @@ def __check_bool_arg(arg: str) -> bool:
         print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":  # noqa: C901
     cli_args = sys.argv[1:]
     no_time = False
     run_once = False
@@ -104,23 +108,28 @@ if __name__ == '__main__':
     verbose = False
 
     try:
-        opts, args = getopt.getopt(cli_args, 'hvfg', ['once', 'notime'])
+        opts, args = getopt.getopt(cli_args, "hvfg", ["once", "notime"])
     except getopt.GetoptError:
         print_help()
     else:
-        for opt, arg in opts:
-            if opt == '-f':
+        for opt, _ in opts:
+            if opt == "-f":
                 store_at_filesystem = True
-            elif opt == '-g':
+            elif opt == "-g":
                 store_at_gdrive = True
-            elif opt == '-h':
+            elif opt == "-h":
                 print_help()
-            elif opt == '--once':
+            elif opt == "--once":
                 run_once = True
-            elif opt == '--notime':
+            elif opt == "--notime":
                 no_time = True
-            elif opt == '-v':
+            elif opt == "-v":
                 verbose = True
 
-    init(store_at_filesystem=store_at_filesystem, store_at_gdrive=store_at_gdrive, verbose=verbose, no_time=no_time)
+    init(
+        store_at_filesystem=store_at_filesystem,
+        store_at_gdrive=store_at_gdrive,
+        verbose=verbose,
+        no_time=no_time,
+    )
     main(run_once=run_once)

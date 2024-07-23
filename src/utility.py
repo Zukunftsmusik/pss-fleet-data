@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta, timezone
 import json
 import os
-from typing import Any, Dict, List, Tuple
 import urllib.request
 import xml.etree.ElementTree
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List, Tuple
 
 import gdrive
 import settings
@@ -11,13 +11,7 @@ import settings
 
 # ---------- Constants ----------
 
-__BYTE_COUNT: List[str] = [
-    'B',
-    'KiB',
-    'MiB',
-    'GiB',
-    'TiB'
-]
+__BYTE_COUNT: List[str] = ["B", "KiB", "MiB", "GiB", "TiB"]
 
 ONE_DAY: timedelta = timedelta(days=1)
 ONE_HOUR: timedelta = timedelta(hours=1)
@@ -25,11 +19,13 @@ ONE_HOUR: timedelta = timedelta(hours=1)
 
 # ---------- Classes ----------
 
+
 class AccessTokenExpiredError(Exception):
     pass
 
 
 # ---------- CLI output ----------
+
 
 def dbg(msg: str) -> None:
     if settings.IS_DEBUG:
@@ -38,9 +34,9 @@ def dbg(msg: str) -> None:
 
 def err(msg: str, error: Exception = None) -> None:
     if error is None:
-        msg = f'ERROR  {msg}'
+        msg = f"ERROR  {msg}"
     else:
-        msg = f'ERROR  {msg}\n{error}'
+        msg = f"ERROR  {msg}\n{error}"
     prnt(msg)
 
 
@@ -52,62 +48,63 @@ def post_wait_message(sleep_for_seconds: float, timestamp: Tuple[int, int, int])
     minutes = int(minutes)
     hours = int(hours)
     if hours > 0:
-        duration = f'{hours}:{minutes:02d}:{seconds:02d}.{microseconds:06d} hours'
+        duration = f"{hours}:{minutes:02d}:{seconds:02d}.{microseconds:06d} hours"
     elif minutes > 0:
-        duration = f'{minutes}:{seconds:02d}.{microseconds:06d} minutes'
+        duration = f"{minutes}:{seconds:02d}.{microseconds:06d} minutes"
     elif seconds > 0:
-        duration = f'{seconds}.{microseconds:06d} seconds'
+        duration = f"{seconds}.{microseconds:06d} seconds"
     elif microseconds > 0:
-        duration = f'{microseconds} microseconds'
+        duration = f"{microseconds} microseconds"
     else:
         return
-    prnt(f'Waiting for {duration} until {timestamp[0]:02d}:{timestamp[1]:02d}:{timestamp[2]:02d} UTC.')
+    prnt(f"Waiting for {duration} until {timestamp[0]:02d}:{timestamp[1]:02d}:{timestamp[2]:02d} UTC.")
 
 
-def print_dict(d, level: int = 0) -> None:
-    for key, value in d.items():
-        indention = '  ' * level
+def print_dict(dct: dict, level: int = 0) -> None:
+    for key, value in dct.items():
+        indention = "  " * level
         if isinstance(value, dict):
-            print(f'{indention}{key}: {{')
+            print(f"{indention}{key}: {{")
             print_dict(value, level + 1)
-            print(f'{indention}}}')
+            print(f"{indention}}}")
         elif isinstance(value, list):
-            print(f'{indention}{key}: [')
+            print(f"{indention}{key}: [")
             print_list(value, level + 1)
-            print(f'{indention}]')
+            print(f"{indention}]")
         else:
-            print(f'{indention}{key}: {value},')
+            print(f"{indention}{key}: {value},")
 
 
-def print_list(l, level: int = 0) -> None:
-    for value in l:
-        indention = '  ' * level
+def print_list(lst: list, level: int = 0) -> None:
+    for value in lst:
+        indention = "  " * level
         if isinstance(value, dict):
             print_dict(value, level + 1)
         elif isinstance(value, list):
-            print(f'{indention}[')
+            print(f"{indention}[")
             print_list(value, level + 1)
-            print(f'{indention}]')
+            print(f"{indention}]")
         else:
-            print(f'{indention}{value},')
+            print(f"{indention}{value},")
 
 
 def prnt(msg: str) -> None:
-    if settings.SETTINGS['print_timestamps']:
+    if settings.SETTINGS["print_timestamps"]:
         utc_now = get_utc_now()
-        print(f'[{utc_now}] {msg}')
+        print(f"[{utc_now}] {msg}")
     else:
         print(msg)
 
 
 def vrbs(msg: str) -> None:
-    if settings.SETTINGS['print_verbose']:
+    if settings.SETTINGS["print_verbose"]:
         prnt(msg)
 
 
 # ---------- Datetime and time ----------
 
-def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple, today: bool = True) -> float:
+
+def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple) -> float:
     hour, minute, second = obtain_at_timestamp
     utc_target = datetime(
         year=utc_now.year,
@@ -117,7 +114,7 @@ def calculate_sleep_for_seconds(utc_now: datetime, obtain_at_timestamp: tuple, t
         minute=minute,
         second=second,
         microsecond=utc_now.microsecond,
-        tzinfo=settings.DEFAULT_TIMEZONE
+        tzinfo=settings.DEFAULT_TIMEZONE,
     )
     timespan = utc_target - utc_now
     if timespan.days < 0:
@@ -137,9 +134,9 @@ def convert_to_bytes_count(bytes: int) -> str:
         bytes /= 1024
         exponent += 1
     if exponent:
-        result = f'{bytes:.2f} {__BYTE_COUNT[exponent]}'
+        result = f"{bytes:.2f} {__BYTE_COUNT[exponent]}"
     else:
-        result = f'{bytes:d} {__BYTE_COUNT[exponent]}'
+        result = f"{bytes:d} {__BYTE_COUNT[exponent]}"
     return result
 
 
@@ -159,9 +156,11 @@ def extract_timestamp_from_file_name(file_name: str, prefix: str = None, suffix:
         suffix = settings.DEFAULT_DATA_FILE_SUFFIX
 
     if prefix and file_name.startswith(prefix):
-        file_name = file_name[len(prefix):]
+        prefix_len = len(prefix)
+        file_name = file_name[prefix_len:]
     if suffix and file_name.endswith(suffix):
-        file_name = file_name[:len(file_name) - len(suffix)]
+        file_name_without_suffix_len = len(file_name) - len(suffix)
+        file_name = file_name[:file_name_without_suffix_len]
 
     return file_name
 
@@ -186,7 +185,7 @@ def get_first_of_next_month(utc_now: datetime = None) -> datetime:
         utc_now = get_utc_now()
     year = utc_now.year
     month = utc_now.month + 1
-    if (month == 13):
+    if month == 13:
         year += 1
         month = 1
     result = datetime(year, month, 1, 0, 0, 0, 0, timezone.utc)
@@ -215,26 +214,27 @@ def parse_pss_timestamp(timestamp: str) -> datetime:
 
 # ---------- Data Retrieval ----------
 
+
 def get_production_server(latest_settings: dict = None) -> str:
     if settings.PRODUCTION_SERVER:
-        return f'https://{settings.PRODUCTION_SERVER}/'
+        return f"https://{settings.PRODUCTION_SERVER}/"
 
     latest_settings = latest_settings or get_latest_settings()
-    production_server = latest_settings.get('ProductionServer') or settings.API_BASE_URL
-    return f'https://{production_server}/'
+    production_server = latest_settings.get("ProductionServer") or settings.API_BASE_URL
+    return f"https://{production_server}/"
 
 
 def get_data_from_url(url: str) -> str:
     data = urllib.request.urlopen(url).read()
-    return data.decode('utf-8')
+    return data.decode("utf-8")
 
 
 def get_data_from_path(path: str, api_server: str = None) -> str:
     if not api_server:
         api_server = get_production_server()
     if path:
-        path = path.strip('/')
-    url = f'{api_server}{path}'
+        path = path.strip("/")
+    url = f"{api_server}{path}"
     return get_data_from_url(url)
 
 
@@ -259,17 +259,17 @@ def get_elapsed_seconds(start: datetime, end: datetime = None) -> float:
 
 
 def get_latest_settings() -> dict:
-    url = f'{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}'
+    url = f"{settings.API_BASE_URL}{settings.SETTINGS_BASE_PATH}"
     data = get_data_from_url(url)
-    d = xmltree_to_dict2(data, 'SettingId')
+    d = xmltree_to_dict2(data, "SettingId")
     for latest_settings in d.values():
-        if 'ProductionServer' in latest_settings:
+        if "ProductionServer" in latest_settings:
             return latest_settings
     return {}
 
 
 def xmltree_to_dict2(raw_text: str, key_name: str) -> Dict[str, dict]:
-    if 'Access token expired.' in raw_text:
+    if "Access token expired." in raw_text:
         raise AccessTokenExpiredError()
     root = xml.etree.ElementTree.fromstring(raw_text)
     d = {}
@@ -281,7 +281,7 @@ def xmltree_to_dict2(raw_text: str, key_name: str) -> Dict[str, dict]:
 
 
 def xmltree_to_dict3(raw_text: str, key_name: str) -> Dict[str, dict]:
-    if 'Access token expired.' in raw_text:
+    if "Access token expired." in raw_text:
         raise AccessTokenExpiredError()
     root = xml.etree.ElementTree.fromstring(raw_text)
     d = {}
@@ -295,13 +295,14 @@ def xmltree_to_dict3(raw_text: str, key_name: str) -> Dict[str, dict]:
 
 # ---------- Storage ----------
 
+
 def save_to_filesystem(content: str, file_name: str, folder_path: str) -> None:
     file_path = os.path.join(folder_path, file_name)
     try:
-        with open(file_path, 'w+') as write_file:
+        with open(file_path, "w+") as write_file:
             write_file.write(content)
     except Exception as error:
-        err(f'Could not create, open or write the file at: {file_path}', error)
+        err(f"Could not create, open or write the file at: {file_path}", error)
 
 
 def save_to_gdrive(content: str, file_name: str) -> None:
@@ -309,30 +310,30 @@ def save_to_gdrive(content: str, file_name: str) -> None:
     try:
         gdrive.upload_file(file_name, content)
     except Exception as error:
-        err(f'Could not upload the file to google drive', error)
+        err("Could not upload the file to google drive", error)
     else:
-        prnt(f'Successfully uploaded {file_name} to google drive.')
+        prnt(f"Successfully uploaded {file_name} to google drive.")
 
 
 def dump_data(data: object, file_name: str, folder_path: str) -> None:
     file_path = os.path.join(folder_path, file_name)
     try:
-        vrbs(f'Start dumping data to file: {file_path}')
-        with open(file_path, 'w+') as write_file:
+        vrbs(f"Start dumping data to file: {file_path}")
+        with open(file_path, "w+") as write_file:
             json.dump(data, write_file)
-        vrbs(f'Dumped data to file: {file_path}')
+        vrbs(f"Dumped data to file: {file_path}")
     except Exception as error:
-        err(f'Could not create, open or write the file at: {file_path}', error)
+        err(f"Could not create, open or write the file at: {file_path}", error)
 
 
 def update_data(data: object, file_name: str, folder_path: str) -> None:
     file_path = os.path.join(folder_path, file_name)
     if os.path.isfile(file_path):
         try:
-            with open(file_path, 'r') as read_file:
+            with open(file_path, "r") as read_file:
                 data_old = json.load(read_file)
         except Exception as error:
-            err(f'Could not read old data from file at: {file_path}', error)
+            err(f"Could not read old data from file at: {file_path}", error)
         else:
             data.extend(data_old)
             data = remove_duplicates(data)
@@ -340,6 +341,7 @@ def update_data(data: object, file_name: str, folder_path: str) -> None:
 
 
 # ---------- Tournament ----------
+
 
 def get_current_tourney_start(utc_now: datetime = None) -> datetime:
     if utc_now is None:
@@ -358,8 +360,9 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
 
 # ---------- Uncategorized ----------
 
+
 def get_collect_file_name(utc_now: datetime) -> str:
-    result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
+    result = f"{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}"
     return result
 
 
