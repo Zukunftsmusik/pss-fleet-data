@@ -30,7 +30,7 @@ store_at_gdrive = False
 
 # ---------- From env vars ----------
 
-ACCESS_TOKEN: str = os.environ.get('PSS_ACCESS_TOKEN')
+ACCESS_TOKEN: str = os.getenv('PSS_ACCESS_TOKEN')
 
 GDRIVE_FOLDER_ID = '10wOZgAQk_0St2Y_jC3UW497LVpBNxWmP'
 
@@ -84,7 +84,7 @@ DELETE_FULL_DATA_AFTER_MONTHS: int = int(os.getenv("DELETE_FULL_DATA_AFTER_MONTH
 OBTAIN_USERS_THREAD_COUNT = 10
 
 
-PRODUCTION_SERVER: str = os.environ.get('PSS_PRODUCTION_SERVER')
+PRODUCTION_SERVER: str = os.getenv('PSS_PRODUCTION_SERVER')
 PSS_START_DATE = datetime(year=2016, month=1, day=6)
 
 
@@ -98,10 +98,10 @@ RANKS_LOOKUP = {
     'Ensign': 5,
     'Candidate': 6
 }
-RETRIEVE_FLEET_USERS: bool = bool(int(os.environ.get('RETRIEVE_FLEET_USERS', 1)))
-RETRIEVE_TOP_USERS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS', 0)))
-RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.environ.get('RETRIEVE_TOP_USERS_DETAILS', 0)))
-RUN_ONCE: bool = bool(int(os.environ.get('RUN_ONCE', 0)))
+RETRIEVE_FLEET_USERS: bool = bool(int(os.getenv('RETRIEVE_FLEET_USERS', 1)))
+RETRIEVE_TOP_USERS: bool = bool(int(os.getenv('RETRIEVE_TOP_USERS', 0)))
+RETRIEVE_TOP_USERS_DETAILS: bool = bool(int(os.getenv('RETRIEVE_TOP_USERS_DETAILS', 0)))
+RUN_ONCE: bool = bool(int(os.getenv('RUN_ONCE', 0)))
 
 
 SETTINGS_BASE_PATH = 'SettingService/GetLatestVersion3?deviceType=DeviceTypeAndroid&languageKey='

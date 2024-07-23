@@ -1,9 +1,8 @@
 from datetime import datetime
 from itertools import repeat
 from multiprocessing.dummy import Pool as ThreadPool
-from os import access
-from urllib.error import HTTPError
 from typing import Dict, List, Union
+from urllib.error import HTTPError
 from xml.etree.ElementTree import ParseError as XmlParseError
 
 import gdrive

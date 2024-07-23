@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Dict
+
 import pydrive.auth
 import pydrive.drive
 import pydrive.files
@@ -26,11 +27,11 @@ def __assert_initialized():
 
 
 def create_service_account_credential_json():
-    project_id = str(os.environ.get('GDRIVE_SERVICE_PROJECT_ID'))
-    private_key_id = str(os.environ.get('GDRIVE_SERVICE_PRIVATE_KEY_ID'))
-    private_key = str(os.environ.get('GDRIVE_SERVICE_PRIVATE_KEY'))
-    client_email = str(os.environ.get('GDRIVE_SERVICE_CLIENT_EMAIL'))
-    client_id = str(os.environ.get('GDRIVE_SERVICE_CLIENT_ID'))
+    project_id = str(os.getenv('GDRIVE_SERVICE_PROJECT_ID'))
+    private_key_id = str(os.getenv('GDRIVE_SERVICE_PRIVATE_KEY_ID'))
+    private_key = str(os.getenv('GDRIVE_SERVICE_PRIVATE_KEY'))
+    client_email = str(os.getenv('GDRIVE_SERVICE_CLIENT_EMAIL'))
+    client_id = str(os.getenv('GDRIVE_SERVICE_CLIENT_ID'))
 
     contents = {}
     contents['type'] = 'service_account'
