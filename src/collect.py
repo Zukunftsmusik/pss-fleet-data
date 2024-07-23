@@ -96,17 +96,6 @@ def print_help():
     print("\n")
 
 
-def __check_bool_arg(arg: str) -> bool:
-    arg = str(arg).lower()
-    if arg in settings.CLI_TRUE_VALUES:
-        return True
-    elif arg in settings.CLI_FALSE_VALUES:
-        return False
-    else:
-        print_help()
-        sys.exit(1)
-
-
 if __name__ == "__main__":  # noqa: C901
     cli_args = sys.argv[1:]
     no_time = False
