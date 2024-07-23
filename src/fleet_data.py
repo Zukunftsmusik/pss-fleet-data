@@ -73,8 +73,8 @@ def collect_data(start_timestamp: datetime) -> dict:
                 if user_id not in user_infos:
                     user_infos.setdefault(user_id, {}).update(top_100_user_info)
 
-    fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values()]
-    users = [get_short_user_info(user_info) for user_info in user_infos.values()]
+    fleets = [get_short_fleet_info(fleet_info) for fleet_info in fleet_infos.values() if fleet_info]
+    users = [get_short_user_info(user_info) for user_info in user_infos.values() if user_info]
     duration = util.get_elapsed_seconds(start_timestamp)
 
     meta_data = {
