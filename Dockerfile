@@ -7,4 +7,4 @@ RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
 COPY src ./src
 
-ENTRYPOINT ["python3", "src/collect.py", "-fv", "--notime", "--clean"]
+ENTRYPOINT ["python3", "src/collect.py", "-gv", "--notime", "--clean"]
