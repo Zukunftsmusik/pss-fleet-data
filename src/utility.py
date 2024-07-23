@@ -387,13 +387,18 @@ def get_rank_number(rank: str) -> int:
     return result
 
 
-def init_logging(debug: bool = None):
+def init_logging(*, print_timestamps: bool = True, debug: bool = None):
     logging_level = logging.INFO
 
     if debug:
         logging_level = logging.DEBUG
 
-    logging.basicConfig(level=logging_level, format="%(asctime)s  %(levelname)-8.8s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    if print_timestamps:
+        format = "%(asctime)s  %(levelname)-8.8s %(message)s"
+    else:
+        format = "%(levelname)-8.8s %(message)s"
+
+    logging.basicConfig(level=logging_level, format=format, datefmt="%Y-%m-%d %H:%M:%S")
     logging.Formatter.converter = time.gmtime
 
 

@@ -22,4 +22,4 @@ def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tour
 
 
 if __name__ == "__main__":
-    util.init_logging(settings.IS_DEBUG)
+    util.init_logging(debug=settings.IS_DEBUG)

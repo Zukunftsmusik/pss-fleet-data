@@ -86,19 +86,17 @@ def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
     bool_values.extend(settings.CLI_TRUE_VALUES)
     print("Usage: collect.py [-fghv] [--once] [--notime] [--clean]\n")
-    print("-f:        Store at file system.")
-    print("-g:        Store at google drive.")
-    print("-h:        Print this help.")
-    print("--clean:   Delete old files from Google Drive, has no meaning without specifying the -g flag.")
-    print("--notime:  Suppress timestamps on cli output.")
-    print("--once:    Run only once.")
-    print("-v:        Verbose mode.")
+    print("  -f:        Store at file system.")
+    print("  -g:        Store at google drive.")
+    print("  -h:        Print this help.")
+    print("  --clean:   Delete old files from Google Drive, has no meaning without specifying the -g flag.")
+    print("  --notime:  Suppress timestamps on cli output.")
+    print("  --once:    Run only once.")
+    print("  -v:        Verbose mode.")
     print("\n")
 
 
 if __name__ == "__main__":  # noqa: C901
-    util.init_logging(settings.IS_DEBUG)
-
     cli_args = sys.argv[1:]
     no_time = False
     run_once = False
@@ -112,23 +110,26 @@ if __name__ == "__main__":  # noqa: C901
     except getopt.GetoptError:
         print_help()
         sys.exit(1)
-    else:
-        for opt, _ in opts:
-            if opt == "-f":
-                store_at_filesystem = True
-            elif opt == "-g":
-                store_at_gdrive = True
-            elif opt == "-h":
-                print_help()
-                sys.exit()
-            elif opt == "--once":
-                run_once = True
-            elif opt == "--notime":
-                no_time = True
-            elif opt == "-v":
-                verbose = True
-            elif opt == "--clean":
-                clean_gdrive = True
+
+    for opt, _ in opts:
+        if opt == "-f":
+            store_at_filesystem = True
+        elif opt == "-g":
+            store_at_gdrive = True
+        elif opt == "-h":
+            print_help()
+            sys.exit()
+        elif opt == "--once":
+            run_once = True
+        elif opt == "--notime":
+            no_time = True
+        elif opt == "-v":
+            verbose = True
+        elif opt == "--clean":
+            clean_gdrive = True
+
+    print_timestamps = no_time is False
+    util.init_logging(print_timestamps=print_timestamps, debug=settings.IS_DEBUG)
 
     try:
         init(
@@ -140,5 +141,6 @@ if __name__ == "__main__":  # noqa: C901
         )
         main(run_once=run_once)
     except KeyboardInterrupt:
+        print()
         util.err("Aborted by user.")
         sys.exit(1)
