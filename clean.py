@@ -5,7 +5,6 @@ import manage_drive as manage
 import settings
 
 
-
 def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tourney_data: bool = False) -> None:
     remove_to: datetime = utc_now - relativedelta(months=settings.DELETE_FULL_DATA_AFTER_MONTHS)
     remove_from = remove_from or remove_to - relativedelta(months=1) + timedelta(days=1)
@@ -18,7 +17,6 @@ def clean_up_gdrive(utc_now: datetime, remove_from: datetime = None, delete_tour
     )
 
     manage.print_quota()
-
 
 
 if __name__ == '__main__':

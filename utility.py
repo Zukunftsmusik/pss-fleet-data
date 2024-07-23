@@ -23,16 +23,10 @@ ONE_DAY: timedelta = timedelta(days=1)
 ONE_HOUR: timedelta = timedelta(hours=1)
 
 
-
-
-
 # ---------- Classes ----------
 
 class AccessTokenExpiredError(Exception):
     pass
-
-
-
 
 
 # ---------- CLI output ----------
@@ -109,9 +103,6 @@ def prnt(msg: str) -> None:
 def vrbs(msg: str) -> None:
     if settings.SETTINGS['print_verbose']:
         prnt(msg)
-
-
-
 
 
 # ---------- Datetime and time ----------
@@ -222,9 +213,6 @@ def parse_pss_timestamp(timestamp: str) -> datetime:
     return result
 
 
-
-
-
 # ---------- Data Retrieval ----------
 
 def get_production_server(latest_settings: dict = None) -> str:
@@ -305,9 +293,6 @@ def xmltree_to_dict3(raw_text: str, key_name: str) -> Dict[str, dict]:
     return d
 
 
-
-
-
 # ---------- Storage ----------
 
 def save_to_filesystem(content: str, file_name: str, folder_path: str) -> None:
@@ -354,9 +339,6 @@ def update_data(data: object, file_name: str, folder_path: str) -> None:
     dump_data(data, file_name, folder_path)
 
 
-
-
-
 # ---------- Tournament ----------
 
 def get_current_tourney_start(utc_now: datetime = None) -> datetime:
@@ -374,11 +356,7 @@ def is_tourney_running(start_date: datetime = None, utc_now: datetime = None) ->
     return start_date <= utc_now
 
 
-
-
-
 # ---------- Uncategorized ----------
-
 
 def get_collect_file_name(utc_now: datetime) -> str:
     result = f'{settings.FILE_NAME_COLLECT_PREFIX}{format_file_timestamp(utc_now)}{settings.FILE_NAME_COLLECT_SUFFIX}'
@@ -424,7 +402,3 @@ def remove_duplicates(_from: List[Any]) -> List[Any]:
 def should_obtain_data(utc_now: datetime, obtain_at_timestamps: list) -> bool:
     result = (utc_now.hour, utc_now.minute, utc_now.second) in obtain_at_timestamps
     return result
-
-
-
-

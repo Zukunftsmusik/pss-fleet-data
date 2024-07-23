@@ -20,7 +20,6 @@ __drive = None
 __initialized = False
 
 
-
 def __assert_initialized():
     if __drive is None:
         raise Exception('The __drive object has not been initialized, yet!')
@@ -136,9 +135,6 @@ def upload_file(data: list, file_name: str) -> None:
     drive_file.SetContentString(content)
     drive_file.Upload()
     util.vrbs(f'Uploaded file to gdrive: {file_name}')
-
-
-
 
 
 def init(force: bool = False):

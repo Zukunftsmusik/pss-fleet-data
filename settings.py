@@ -187,7 +187,6 @@ print_verbose = False
 obtain_at_timestamps = []
 
 
-
 if OBTAIN_AT_HOURS:
     for hour in OBTAIN_AT_HOURS:
         for minute in OBTAIN_AT_MINUTES:

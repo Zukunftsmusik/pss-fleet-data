@@ -5,7 +5,6 @@ import settings
 import utility as util
 
 
-
 def delete_all_files_but_latest_daily(from_year: int = None, from_month: int = None, from_day: int = None, to_year: int = None, to_month: int = None, to_day: int = None, delete_tourney_data: bool = False):
     gdrive.init()
     utc_now = util.get_utc_now()

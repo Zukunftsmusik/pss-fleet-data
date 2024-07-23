@@ -37,9 +37,6 @@ def main(run_once: bool = None):
                 time.sleep(sleep_for_seconds)
 
 
-
-
-
 def init(store_at_filesystem: bool = None, store_at_gdrive: bool = None, verbose: bool = None, no_time: bool = None) -> dict:
     PWD = os.getcwd()
     sys.path.insert(0, f'{PWD}/')
@@ -96,8 +93,6 @@ def __check_bool_arg(arg: str) -> bool:
         return False
     else:
         print_help()
-
-
 
 
 if __name__ == '__main__':
