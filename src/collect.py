@@ -24,7 +24,7 @@ def main(run_once: bool = None):
             if obtain_data:
                 latest_timestamp = next_timestamp
                 fleet_data.retrieve_and_store_user_infos()
-                if utc_now.month != (utc_now + util.ONE_HOUR).month:
+                if settings.SETTINGS["store_at_gdrive"] and settings.SETTINGS["clean_gdrive"] and utc_now.month != (utc_now + util.ONE_HOUR).month:
                     clean.clean_up_gdrive(utc_now)
             else:
                 utc_now = util.get_utc_now()
@@ -42,6 +42,7 @@ def init(
     store_at_gdrive: bool = None,
     verbose: bool = None,
     no_time: bool = None,
+    clean_gdrive: bool = None,
 ) -> dict:
     PWD = os.getcwd()
     sys.path.insert(0, f"{PWD}/")
@@ -70,6 +71,12 @@ def init(
         if store_at_gdrive:
             gdrive.init()
 
+            if clean_gdrive is None:
+                util.vrbs(f'Clean google drive: {settings.SETTINGS["clean_gdrive"]}')
+            else:
+                settings.SETTINGS["clean_gdrive"] = clean_gdrive
+                util.vrbs(f"Clean google drive: {clean_gdrive}")
+
     for folder_name in settings.CREATE_FOLDERS_ON_COLLECT:
         if not os.path.isdir(folder_name):
             os.mkdir(folder_name)
@@ -78,15 +85,15 @@ def init(
 def print_help():
     bool_values = list(settings.CLI_FALSE_VALUES)
     bool_values.extend(settings.CLI_TRUE_VALUES)
-    print("Usage: collect.py [-fghv] [--once] [--notime]\n")
-    print("-f:       Store at file system")
-    print("-g:       Store at google drive")
-    print("-h:       Print this help")
-    print("--notime: Suppress timestamps on cli output")
-    print("--once:   Run only once")
-    print("-v:       Verbose mode")
+    print("Usage: collect.py [-fghv] [--once] [--notime] [--clean]\n")
+    print("-f:        Store at file system.")
+    print("-g:        Store at google drive.")
+    print("-h:        Print this help.")
+    print("--clean:   Delete old files from Google Drive, has no meaning without specifying the -g flag.")
+    print("--notime:  Suppress timestamps on cli output.")
+    print("--once:    Run only once.")
+    print("-v:        Verbose mode.")
     print("\n")
-    sys.exit()
 
 
 def __check_bool_arg(arg: str) -> bool:
@@ -97,6 +104,7 @@ def __check_bool_arg(arg: str) -> bool:
         return False
     else:
         print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":  # noqa: C901
@@ -106,11 +114,13 @@ if __name__ == "__main__":  # noqa: C901
     store_at_filesystem = False
     store_at_gdrive = False
     verbose = False
+    clean_gdrive = False
 
     try:
         opts, args = getopt.getopt(cli_args, "hvfg", ["once", "notime"])
     except getopt.GetoptError:
         print_help()
+        sys.exit(1)
     else:
         for opt, _ in opts:
             if opt == "-f":
@@ -119,17 +129,25 @@ if __name__ == "__main__":  # noqa: C901
                 store_at_gdrive = True
             elif opt == "-h":
                 print_help()
+                sys.exit()
             elif opt == "--once":
                 run_once = True
             elif opt == "--notime":
                 no_time = True
             elif opt == "-v":
                 verbose = True
+            elif opt == "--clean":
+                clean_gdrive = True
 
-    init(
-        store_at_filesystem=store_at_filesystem,
-        store_at_gdrive=store_at_gdrive,
-        verbose=verbose,
-        no_time=no_time,
-    )
-    main(run_once=run_once)
+    try:
+        init(
+            store_at_filesystem=store_at_filesystem,
+            store_at_gdrive=store_at_gdrive,
+            verbose=verbose,
+            no_time=no_time,
+            clean_gdrive=clean_gdrive,
+        )
+        main(run_once=run_once)
+    except KeyboardInterrupt:
+        util.err("Aborted by user.")
+        sys.exit(1)

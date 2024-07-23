@@ -14,6 +14,7 @@ SETTINGS = {
     "store_at_filesystem": False,
     "store_at_gdrive": False,
     "print_verbose": False,
+    "clean_gdrive": False,
 }
 
 
