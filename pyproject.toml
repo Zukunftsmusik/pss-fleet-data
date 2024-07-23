@@ -1,9 +1,9 @@
 [project]
 name = "pss-fleet-data"
-version = "0.1.0"
-description = "Add your description here"
+version = "9.1.0"
+description = "A tool to obtain data about fleets of Pixel Starships."
 authors = [
-    { name = "The worst.", email = "5472896+Zukunftsmusik@users.noreply.github.com" }
+    { name = "The worst.", email = "theworstpss@gmail.com" }
 ]
 dependencies = [
     "google-auth==1.20.0",
@@ -13,9 +13,6 @@ dependencies = [
 ]
 readme = "README.md"
 requires-python = ">= 3.10.14"
-
-[project.scripts]
-"pss-fleet-data" = "pss_fleet_data:main"
 
 [tool.rye]
 managed = true
