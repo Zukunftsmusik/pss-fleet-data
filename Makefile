@@ -26,4 +26,4 @@ docker:
 	docker rm -f container-pss-fleet-data
 	docker image rm -f image-pss-fleet-data:latest
 	docker build -t image-pss-fleet-data .
-	docker run -d --name container-pss-fleet-data image-pss-fleet-data:latest
+	docker run -d --name container-pss-fleet-data --stop-timeout 2 image-pss-fleet-data:latest
