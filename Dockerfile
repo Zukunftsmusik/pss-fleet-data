@@ -1,10 +1,10 @@
 FROM python:3.10-slim
 
-RUN mkdir -p /usr/bot
-WORKDIR /usr/bot
+WORKDIR /app
 
-COPY ./src ./src
+COPY requirements.lock ./
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-RUN pip3 install -r requirements.lock
+COPY src ./src
 
-CMD [ "python3", "src/collect.py", "-g", "-v", "--notime" ]
+ENTRYPOINT ["python3", "src/collect.py", "-f", "-v", "--notime"]
