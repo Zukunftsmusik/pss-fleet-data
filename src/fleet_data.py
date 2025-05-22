@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import repeat
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.pool import ThreadPool
 from typing import Dict, List, Union
 from urllib.error import HTTPError
 from xml.etree.ElementTree import ParseError as XmlParseError
@@ -148,7 +148,7 @@ def get_tournament_fleets(api_server: str) -> Dict[str, dict]:
 
 def get_fleets_user_infos_raw(fleet_infos: dict, api_server: str, access_token: str) -> List[str]:
     args = zip(list(fleet_infos.keys()), repeat(api_server), repeat(access_token))  # noqa: B905
-    pool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
+    pool: ThreadPool = ThreadPool(settings.OBTAIN_USERS_THREAD_COUNT)
     result = pool.starmap(get_fleet_users_raw, args)
     pool.close()
     pool.join()

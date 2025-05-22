@@ -25,7 +25,7 @@ def main(run_once: bool = None):
                 latest_timestamp = next_timestamp
                 fleet_data.retrieve_and_store_user_infos()
                 if settings.SETTINGS["store_at_gdrive"] and settings.SETTINGS["clean_gdrive"] and utc_now.month != (utc_now + util.ONE_HOUR).month:
-                    clean.clean_up_gdrive(utc_now)
+                    clean.clean_up_gdrive(utc_now, delete_tourney_data=True)
             else:
                 utc_now = util.get_utc_now()
                 next_timestamp = util.get_next_matching_timestamp(utc_now, settings.obtain_at_timestamps)
