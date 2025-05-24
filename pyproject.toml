@@ -1,6 +1,6 @@
 [project]
 name = "pss-fleet-data"
-version = "9.1.0"
+version = "9.2.0"
 description = "A tool to obtain data about fleets of Pixel Starships."
 authors = [
     { name = "The worst.", email = "theworstpss@gmail.com" }
